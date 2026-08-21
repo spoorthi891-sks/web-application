@@ -94,7 +94,7 @@ export default function Checkout() {
         </p>
         <Link
           to="/explore"
-          className="mt-8 inline-block rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#0B0F12] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition hover:bg-[#10B981]"
+          className="mt-8 inline-block rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition hover:bg-[#10B981]"
         >
           Back to marketplace
         </Link>
@@ -132,7 +132,7 @@ export default function Checkout() {
 
   if (phase === "done") {
     return (
-      <div className="relative min-h-screen bg-[#0B0F12]">
+      <div className="relative min-h-screen bg-[#080C0E]">
         <div className="pointer-events-none absolute top-10 left-1/2 h-[450px] w-[600px] -translate-x-1/2 rounded-full bg-[#00FF9D]/[0.08] blur-[140px]" />
 
         <div className="relative mx-auto max-w-2xl px-6 py-24 text-center">
@@ -154,7 +154,7 @@ export default function Checkout() {
             <button
               type="button"
               onClick={handleCopyKey}
-              className="shrink-0 rounded-full border border-white/20 bg-[#0B0F12] px-4 py-2 font-mono text-xs font-semibold text-slate-200 transition hover:border-[#00FF9D] hover:text-[#00FF9D]"
+              className="shrink-0 rounded-full border border-white/20 bg-[#080C0E] px-4 py-2 font-mono text-xs font-semibold text-slate-200 transition hover:border-[#00FF9D] hover:text-[#00FF9D] cursor-pointer"
             >
               {copied ? "COPIED ✓" : "COPY KEY"}
             </button>
@@ -163,13 +163,13 @@ export default function Checkout() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to="/sandbox"
-              className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#0B0F12] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)]"
+              className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)]"
             >
               Run inference in Sandbox
             </Link>
             <Link
               to={`/models/${encodeURIComponent(model.id)}`}
-              className="rounded-full border border-white/10 bg-[#12181F] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
+              className="rounded-full border border-white/10 bg-[#0E141B] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
             >
               Back to model specs
             </Link>
@@ -200,7 +200,7 @@ export default function Checkout() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#0B0F12]">
+    <div className="relative min-h-screen bg-[#080C0E]">
       <div className="relative mx-auto max-w-5xl px-6 py-12">
         <Link
           to={`/models/${encodeURIComponent(model.id)}`}
@@ -222,7 +222,7 @@ export default function Checkout() {
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_380px]">
           <form
             onSubmit={handlePay}
-            className="space-y-5 rounded-2xl border border-white/[0.08] bg-[#12181F]/90 p-6 sm:p-8 shadow-xl backdrop-blur-md"
+            className="space-y-5 rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-6 sm:p-8 shadow-xl backdrop-blur-md"
           >
             <div>
               <label
@@ -238,7 +238,7 @@ export default function Checkout() {
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="eng-lead@enterprise.com"
                 autoComplete="email"
-                className="w-full rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#080C0E] px-4 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
               />
             </div>
 
@@ -256,7 +256,7 @@ export default function Checkout() {
                 onChange={(event) => setCardNumber(formatCardNumber(event.target.value))}
                 placeholder="4242 4242 4242 4242"
                 autoComplete="cc-number"
-                className="w-full rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-2.5 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#080C0E] px-4 py-2.5 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
               />
             </div>
 
@@ -275,7 +275,7 @@ export default function Checkout() {
                   onChange={(event) => setExpiry(formatExpiry(event.target.value))}
                   placeholder="MM/YY"
                   autoComplete="cc-exp"
-                  className="w-full rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-2.5 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+                  className="w-full rounded-xl border border-white/[0.1] bg-[#080C0E] px-4 py-2.5 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
                 />
               </div>
               <div>
@@ -294,7 +294,7 @@ export default function Checkout() {
                   }
                   placeholder="123"
                   autoComplete="cc-csc"
-                  className="w-full rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-2.5 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+                  className="w-full rounded-xl border border-white/[0.1] bg-[#080C0E] px-4 py-2.5 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
                 />
               </div>
             </div>
@@ -312,18 +312,18 @@ export default function Checkout() {
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Ada Lovelace"
                 autoComplete="cc-name"
-                className="w-full rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#080C0E] px-4 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
               />
             </div>
 
             <button
               type="submit"
               disabled={!formValid || phase === "processing"}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#00FF9D] px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#0B0F12] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#00FF9D] px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             >
               {phase === "processing" ? (
                 <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#0B0F12] border-t-transparent" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#080C0E] border-t-transparent" />
                   PROVISIONING INSTANCE...
                 </>
               ) : (
@@ -335,10 +335,10 @@ export default function Checkout() {
             </p>
           </form>
 
-          <aside className="space-y-5 rounded-2xl border border-white/[0.08] bg-[#12181F]/90 p-6 shadow-xl backdrop-blur-md lg:sticky lg:top-24">
+          <aside className="space-y-5 rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-6 shadow-xl backdrop-blur-md lg:sticky lg:top-24">
             <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">Order Summary</h2>
 
-            <div className="flex items-start justify-between gap-3 rounded-xl border border-white/[0.07] bg-[#0B0F12]/80 p-4">
+            <div className="flex items-start justify-between gap-3 rounded-xl border border-white/[0.07] bg-[#080C0E]/80 p-4">
               <div>
                 <p className="text-sm font-bold text-white">{model.name}</p>
                 <p className="mt-0.5 font-mono text-[11px] uppercase tracking-wider text-slate-400">

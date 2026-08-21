@@ -79,8 +79,8 @@ export default function CodeGenerator({ model }) {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#12181F]/90 shadow-xl backdrop-blur-md">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] bg-[#0E1319] px-6 py-4">
+    <section className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 shadow-xl backdrop-blur-md">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] bg-[#080C0E] px-6 py-4">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
@@ -96,13 +96,13 @@ export default function CodeGenerator({ model }) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1 rounded-full border border-white/[0.08] bg-[#0B0F12] p-1">
+        <div className="flex items-center gap-1 rounded-full border border-white/[0.08] bg-[#0E141B] p-1">
           {LANGUAGES.map((lang) => (
             <button
               key={lang}
               type="button"
               onClick={() => setLanguage(lang)}
-              className={`rounded-full px-3.5 py-1 font-mono text-[11px] font-medium transition-all ${
+              className={`rounded-full px-3.5 py-1 font-mono text-[11px] font-medium transition-all cursor-pointer ${
                 language === lang
                   ? "bg-white/15 text-white shadow-sm border border-white/10"
                   : "text-slate-400 hover:text-white"
@@ -114,14 +114,14 @@ export default function CodeGenerator({ model }) {
         </div>
       </header>
 
-      <div className="relative bg-[#070A0D]">
+      <div className="relative bg-[#05080A]">
         <pre className="overflow-x-auto p-6 font-mono text-xs leading-relaxed text-[#00FF9D]">
           <code>{snippet}</code>
         </pre>
         <button
           type="button"
           onClick={handleCopy}
-          className="absolute right-4 top-4 rounded-full border border-white/15 bg-[#12181F]/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-slate-200 shadow-md backdrop-blur-md transition-all hover:border-[#00FF9D]/50 hover:text-[#00FF9D]"
+          className="absolute right-4 top-4 rounded-full border border-white/15 bg-[#0E141B]/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-slate-200 shadow-md backdrop-blur-md transition-all hover:border-[#00FF9D]/50 hover:text-[#00FF9D] cursor-pointer"
         >
           {copied ? "COPIED ✓" : "COPY SNIPPET"}
         </button>

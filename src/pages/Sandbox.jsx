@@ -287,9 +287,9 @@ export default function Sandbox() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#0B0F12]">
+    <div className="relative min-h-screen bg-[#080C0E]">
       {/* Background ambient lighting */}
-      <div className="pointer-events-none absolute top-10 right-1/4 h-[350px] w-[500px] rounded-full bg-[#00FF9D]/[0.05] blur-[140px]" />
+      <div className="pointer-events-none absolute top-10 right-1/4 h-[350px] w-[500px] rounded-full bg-[#00FF9D]/[0.04] blur-[140px]" />
 
       <div className="relative mx-auto max-w-7xl px-6 py-12">
         <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-[10px] font-semibold tracking-widest text-[#00FF9D] uppercase">
@@ -306,7 +306,7 @@ export default function Sandbox() {
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-2">
           <form
             onSubmit={handleRun}
-            className="space-y-5 rounded-2xl border border-white/[0.08] bg-[#12181F]/90 p-6 sm:p-8 shadow-xl backdrop-blur-md"
+            className="space-y-5 rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-6 sm:p-8 shadow-xl backdrop-blur-md"
           >
             <div>
               <label
@@ -319,7 +319,7 @@ export default function Sandbox() {
                 id="sandbox-model"
                 value={modelId}
                 onChange={(event) => setModelId(event.target.value)}
-                className="w-full rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-2.5 font-mono text-xs text-slate-100 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#080C0E] px-4 py-2.5 font-mono text-xs text-slate-100 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
               >
                 {MODELS.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -342,7 +342,7 @@ export default function Sandbox() {
                 value={prompt}
                 onChange={(event) => setPrompt(event.target.value)}
                 placeholder="Summarize this technical specification and flag any auto-renewal clauses..."
-                className="w-full resize-y rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-3 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+                className="w-full resize-y rounded-xl border border-white/[0.1] bg-[#080C0E] px-4 py-3 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
               />
             </div>
 
@@ -360,10 +360,10 @@ export default function Sandbox() {
               </p>
               <button
                 type="submit"
-                className={`rounded-full px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-md disabled:opacity-40 ${
+                className={`rounded-full px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-md disabled:opacity-40 cursor-pointer ${
                   isRunning
                     ? "border border-rose-500/50 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20"
-                    : "bg-[#00FF9D] text-[#0B0F12] shadow-[0_0_20px_rgba(0,255,157,0.35)] hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] active:scale-95"
+                    : "bg-[#00FF9D] text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95"
                 }`}
                 disabled={!isRunning && !prompt.trim()}
               >
@@ -372,11 +372,11 @@ export default function Sandbox() {
             </div>
           </form>
 
-          <section className="rounded-2xl border border-white/[0.08] bg-[#12181F]/90 p-6 sm:p-8 shadow-xl backdrop-blur-md">
+          <section className="rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-6 sm:p-8 shadow-xl backdrop-blur-md">
             <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] pb-4">
               <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">Stream Output</h2>
               <div className="flex items-center gap-2">
-                <span className="rounded-full border border-white/[0.08] bg-[#0B0F12] px-3 py-1 font-mono text-[10px] text-slate-400">
+                <span className="rounded-full border border-white/[0.08] bg-[#080C0E] px-3 py-1 font-mono text-[10px] text-slate-400">
                   POST /v1/invoke
                 </span>
                 <span
@@ -389,7 +389,7 @@ export default function Sandbox() {
 
             <div
               aria-live="polite"
-              className="mt-5 min-h-[240px] rounded-xl border border-white/[0.06] bg-[#070A0D] p-5 shadow-inner"
+              className="mt-5 min-h-[240px] rounded-xl border border-white/[0.06] bg-[#05080A] p-5 shadow-inner"
             >
               {run.output ? (
                 <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-[#00FF9D]">
@@ -414,7 +414,7 @@ export default function Sandbox() {
 
             <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.06] sm:grid-cols-4">
               {metrics.map(({ label, value }) => (
-                <div key={label} className="flex flex-col bg-[#0B0F12] px-4 py-3">
+                <div key={label} className="flex flex-col bg-[#080C0E] px-4 py-3">
                   <dd className="font-mono text-sm font-bold text-white">{value}</dd>
                   <dt className="mt-1 font-mono text-[10px] uppercase tracking-wider text-slate-500">
                     {label}

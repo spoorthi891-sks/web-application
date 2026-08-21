@@ -24,7 +24,7 @@ export default function PricingSection({ model }) {
   }
 
   return (
-    <section className="mt-10 rounded-2xl border border-white/[0.08] bg-[#12181F]/90 p-6 sm:p-8 shadow-xl backdrop-blur-md">
+    <section className="mt-10 rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-6 sm:p-8 shadow-xl backdrop-blur-md">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/[0.07] pb-6">
         <div>
           <div className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-[#00FF9D] uppercase tracking-wider">
@@ -40,13 +40,13 @@ export default function PricingSection({ model }) {
         <button
           type="button"
           onClick={goToCheckout}
-          className="shrink-0 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#0B0F12] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] active:scale-95"
+          className="shrink-0 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95 cursor-pointer"
         >
           Continue to checkout →
         </button>
       </div>
 
-      <div className="mt-6 grid gap-6 sm:grid-cols-2 rounded-xl border border-white/[0.06] bg-[#0B0F12]/60 p-5">
+      <div className="mt-6 grid gap-6 sm:grid-cols-2 rounded-xl border border-white/[0.06] bg-[#080C0E]/70 p-5">
         <div>
           <div className="mb-2 flex items-center justify-between font-mono text-xs">
             <span className="font-semibold uppercase tracking-wider text-slate-400">
@@ -101,12 +101,12 @@ export default function PricingSection({ model }) {
               aria-pressed={selected}
               className={`relative flex flex-col justify-between rounded-2xl border p-6 text-left transition-all duration-300 ${
                 selected
-                  ? "border-[#00FF9D] bg-[#00FF9D]/[0.04] shadow-[0_0_32px_-8px_rgba(0,255,157,0.3)] ring-1 ring-[#00FF9D]/40"
-                  : "border-white/[0.08] bg-[#0B0F12]/80 hover:border-white/20 hover:bg-[#12181F]"
+                  ? "border-[#00FF9D] bg-[#00FF9D]/[0.04] shadow-[0_0_32px_-8px_rgba(0,255,157,0.25)] ring-1 ring-[#00FF9D]/40"
+                  : "border-white/[0.08] bg-[#080C0E]/80 hover:border-white/20 hover:bg-[#131B24]"
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-3 right-5 rounded-full border border-emerald-500/40 bg-[#0B0F12] px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#00FF9D] shadow-md">
+                <span className="absolute -top-3 right-5 rounded-full border border-emerald-500/40 bg-[#080C0E] px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#00FF9D] shadow-md">
                   POPULAR CHOICE
                 </span>
               )}
