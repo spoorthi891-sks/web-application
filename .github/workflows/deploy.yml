@@ -1,16 +1,16 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages #deployment
 
 on:
   push:
-    branches: [main]
+    branches: [main]        #sub branches
   workflow_dispatch:
 
-permissions:
+permissions:                  #tokens
   contents: read
   pages: write
   id-token: write
 
-concurrency:
+concurrency:                          
   group: pages
   cancel-in-progress: true
 
@@ -23,9 +23,9 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm ci                                                       
       - run: npm run build
-      - name: SPA fallback for client-side routes
+      - name: SPA fallback for client-side routes    #commandline commands 
         run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -33,10 +33,10 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest                     
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}            # deploy url
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4                  #gitpages deplayment

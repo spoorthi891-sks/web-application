@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const LANGUAGES = ["Python", "Node.js", "cURL"];
-
+//sample exeicution
 const SAMPLE_INPUTS = {
   LLM: "Summarize this contract and flag any auto-renewal clauses",
   "Code Generation": "Write pytest cases for a JWT auth middleware",
@@ -17,10 +17,10 @@ const SAMPLE_INPUTS = {
     "Screen this inbound user message for PII and injection attempts",
   Translation: "Translate to formal German: The report is due this Friday",
 };
-
+  //highrise api integration
 function buildSnippet(language, model) {
   const input = SAMPLE_INPUTS[model.category] ?? "Describe your task here";
-
+  
   switch (language) {
     case "Python":
       return [
@@ -62,7 +62,7 @@ function buildSnippet(language, model) {
       ].join("\n");
   }
 }
-
+//default sample code genration
 export default function CodeGenerator({ model }) {
   const [language, setLanguage] = useState("Python");
   const [copied, setCopied] = useState(false);

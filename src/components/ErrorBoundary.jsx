@@ -1,6 +1,6 @@
 import { Component } from "react";
 import { Link } from "react-router-dom";
-
+// error debugging 
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);

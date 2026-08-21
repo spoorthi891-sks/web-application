@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { signIn } from "../utils/auth.js";
 
+// login interface 
+
 export default function AuthModal({ onClose }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -19,7 +21,8 @@ export default function AuthModal({ onClose }) {
   const emailValid = /.+@.+\..+/.test(email);
   const nameValid = name.trim().length > 1;
   const formValid = emailValid && nameValid;
-
+  
+  //authentication
   function handleSubmit(event) {
     event.preventDefault();
     setSubmitted(true);
@@ -38,7 +41,9 @@ export default function AuthModal({ onClose }) {
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       onClick={onClose}
       role="presentation"
-    >
+
+    >  //visuals and buttons
+
       <div
         role="dialog"
         aria-modal="true"
@@ -73,7 +78,7 @@ export default function AuthModal({ onClose }) {
               <label
                 htmlFor="auth-email"
                 className="mb-1.5 block font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400"
-              >
+              >  //default example
                 Work email address
               </label>
               <input
@@ -97,7 +102,9 @@ export default function AuthModal({ onClose }) {
               <label
                 htmlFor="auth-name"
                 className="mb-1.5 block font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400"
-              >
+
+              > // 2 step authentication
+
                 Full name
               </label>
               <input

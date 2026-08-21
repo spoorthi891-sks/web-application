@@ -29,7 +29,7 @@ function FilterGroup({ title, options, selected, onToggle, last = false }) {
     </div>
   );
 }
-
+//default ui functions
 export default function FilterSidebar({
   categories,
   providers,
