@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import AuthModal from "./AuthModal.jsx";
 import { useAuth } from "../utils/auth.js";
-
+//navigation bar
 const LINKS = [
   { to: "/", label: "Home", end: true },
   { to: "/explore", label: "Explore" },
