@@ -122,7 +122,7 @@ export default function HfModelDetail({ model }) {
               View on Hugging Face ↗
             </a>
             <Link
-              to="/sandbox"
+              to={`/sandbox?model=${encodeURIComponent(model.id)}`}
               className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95 cursor-pointer"
             >
               Open in Sandbox

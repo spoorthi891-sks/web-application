@@ -1,8 +1,9 @@
 export function isRequestPriced(model) {
-  return model.pricingPerRequest != null;
+  return model?.pricingPerRequest != null;
 }
 
 export function estimateCost(model, units = 0) {
+  if (!model) return 0;
   if (isRequestPriced(model)) {
     return units * model.pricingPerRequest;
   }
@@ -10,6 +11,7 @@ export function estimateCost(model, units = 0) {
 }
 
 export function priceLabel(model) {
+  if (!model) return "—";
   return isRequestPriced(model)
     ? `${formatUSD(model.pricingPerRequest)} / request`
     : `${formatUSD(model.pricingPer1kTokens)} / 1K tokens`;
@@ -19,6 +21,7 @@ export function estimateMonthlyCost(
   model,
   { monthlyRequests = 0, avgTokensPerRequest = 0 } = {},
 ) {
+  if (!model) return 0;
   if (isRequestPriced(model)) {
     return monthlyRequests * model.pricingPerRequest;
   }

@@ -95,11 +95,22 @@ export function mapHfModel(hfModel) {
   };
 }
 
-export async function fetchTrendingModels({ limit = 24 } = {}) {
-  const url = `${HF_API_URL}?pipeline_tag=text-generation&sort=trendingScore&direction=-1&limit=${limit}`;
+const TRENDING_PIPELINES = [
+  "text-generation",
+  "text-to-image",
+  "automatic-speech-recognition",
+  "feature-extraction",
+  "image-text-to-text",
+  "translation",
+  "text-classification",
+];
+
+async function fetchPipelinePage(pipeline, perPipeline) {
+  const url = `${HF_API_URL}?pipeline_tag=${encodeURIComponent(
+    pipeline,
+  )}&sort=trendingScore&direction=-1&limit=${perPipeline}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
   try {
     const response = await fetch(url, { signal: controller.signal });
     if (!response.ok) {
@@ -118,6 +129,54 @@ export async function fetchTrendingModels({ limit = 24 } = {}) {
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+export async function fetchTrendingModels({ limit = 30, perPipeline = 6 } = {}) {
+  const settled = await Promise.allSettled(
+    TRENDING_PIPELINES.map((pipeline) =>
+      fetchPipelinePage(pipeline, perPipeline),
+    ),
+  );
+
+  const models = settled
+    .filter((result) => result.status === "fulfilled")
+    .flatMap((result) => result.value);
+
+  if (models.length === 0) {
+    throw new Error(
+      "Could not reach the Hugging Face Hub. Check your connection and try again.",
+    );
+  }
+
+  const seen = new Set();
+  const unique = [];
+  for (const model of models) {
+    if (!seen.has(model.id)) {
+      seen.add(model.id);
+      unique.push(model);
+    }
+  }
+
+  // Interleave round-robin across categories so the catalog leads with variety
+  const buckets = new Map();
+  for (const model of unique) {
+    const bucket = buckets.get(model.category) ?? [];
+    bucket.push(model);
+    buckets.set(model.category, bucket);
+  }
+  const interleaved = [];
+  let added = true;
+  while (interleaved.length < unique.length && added) {
+    added = false;
+    for (const bucket of buckets.values()) {
+      if (bucket.length > 0) {
+        interleaved.push(bucket.shift());
+        added = true;
+      }
+    }
+  }
+
+  return interleaved.slice(0, limit);
 }
 
 function extractBaseModels(tags = []) {

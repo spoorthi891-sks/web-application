@@ -343,11 +343,20 @@ export default function Home() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {VALUE_PROPS.map(({ step, title, body, icon }) => (
-            <article
-              key={step}
-              className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E141B]/90 p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#00FF9D]/40 hover:bg-[#131B24] hover:shadow-[0_12px_36px_-8px_rgba(0,255,157,0.15)]"
-            >
+          {VALUE_PROPS.map(({ step, title, body, icon }) => {
+            const cta =
+              step === "01"
+                ? { to: "/matchmaker", label: "TRY THE MATCHMAKER" }
+                : step === "02"
+                  ? { to: "/compare", label: "COMPARE MONTHLY COSTS" }
+                  : null;
+            const ArticleTag = cta ? Link : "article";
+            return (
+              <ArticleTag
+                key={step}
+                {...(cta ? { to: cta.to } : {})}
+                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E141B]/90 p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#00FF9D]/40 hover:bg-[#131B24] hover:shadow-[0_12px_36px_-8px_rgba(0,255,157,0.15)]"
+              >
               <div>
                 <div className="flex items-center justify-between">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/[0.08] bg-[#080C0E] shadow-inner group-hover:border-[#00FF9D]/30 transition-colors">
@@ -363,9 +372,16 @@ export default function Home() {
                 <p className="mt-2.5 text-xs leading-relaxed text-slate-400">
                   {body}
                 </p>
+                {cta && (
+                  <span className="mt-4 inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#00FF9D]">
+                    {cta.label}
+                    <span className="transition-transform group-hover:translate-x-1">→</span>
+                  </span>
+                )}
               </div>
-            </article>
-          ))}
+              </ArticleTag>
+            );
+          })}
         </div>
       </section>
     </div>

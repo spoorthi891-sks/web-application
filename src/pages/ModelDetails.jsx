@@ -75,7 +75,7 @@ function RegistryView({ model }) {
               Deploy to production
             </button>
             <Link
-              to="/sandbox"
+              to={`/sandbox?model=${encodeURIComponent(model.id)}`}
               className="rounded-full border border-white/[0.1] bg-[#0E141B]/90 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition-all hover:border-[#00FF9D]/40 hover:text-[#00FF9D] hover:bg-[#131B24]"
             >
               Open in Sandbox

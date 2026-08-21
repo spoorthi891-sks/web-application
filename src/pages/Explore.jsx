@@ -1,21 +1,72 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { fetchTrendingModels } from "../utils/hfHub.js";
 import { recommendModels, unitPrice } from "../utils/matchmakerAlgo.js";
 import ModelCard from "../components/ModelCard.jsx";
 import FilterSidebar from "../components/FilterSidebar.jsx";
 import SkeletonCard from "../components/SkeletonCard.jsx";
 
+const SORT_OPTIONS = [
+  { id: "trending", label: "Trending" },
+  { id: "downloads", label: "Most downloaded" },
+  { id: "likes", label: "Most liked" },
+  { id: "price", label: "Price · low to high" },
+];
+
+function readListParam(searchParams, key) {
+  return (searchParams.get(key) ?? "").split(",").filter(Boolean);
+}
+
 export default function Explore() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [models, setModels] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
-  const [query, setQuery] = useState(searchParams.get("q") ?? "");
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedProviders, setSelectedProviders] = useState([]);
-  const [selectedPrivacy, setSelectedPrivacy] = useState([]);
-  const [maxPrice, setMaxPrice] = useState(Infinity);
+
+  // Single source of truth: the URL. Every filter is a shareable param.
+  const query = searchParams.get("q") ?? "";
+  const sortBy = searchParams.get("sort") ?? "trending";
+  const selectedCategories = useMemo(
+    () => readListParam(searchParams, "cat"),
+    [searchParams],
+  );
+  const selectedProviders = useMemo(
+    () => readListParam(searchParams, "prov"),
+    [searchParams],
+  );
+  const selectedPrivacy = useMemo(
+    () => readListParam(searchParams, "privacy"),
+    [searchParams],
+  );
+  const parsedMax = searchParams.has("max")
+    ? Number(searchParams.get("max"))
+    : Infinity;
+  const maxPrice = Number.isFinite(parsedMax) ? parsedMax : Infinity;
+
+  function updateParam(key, value) {
+    setSearchParams(
+      (current) => {
+        const params = new URLSearchParams(current);
+        if (value == null || value === "") {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+        return params;
+      },
+      { replace: true },
+    );
+  }
+
+  function toggleListParam(key) {
+    return (value) => {
+      const current = readListParam(searchParams, key);
+      const next = current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value];
+      updateParam(key, next.join(","));
+    };
+  }
 
   function load() {
     setStatus("loading");
@@ -23,10 +74,6 @@ export default function Explore() {
     fetchTrendingModels()
       .then((data) => {
         setModels(data);
-        setMaxPrice(Math.max(...data.map(unitPrice), 0));
-        setSelectedCategories([]);
-        setSelectedProviders([]);
-        setSelectedPrivacy([]);
         setStatus("ready");
       })
       .catch((err) => {
@@ -38,15 +85,6 @@ export default function Explore() {
   useEffect(() => {
     load();
   }, []);
-
-  function toggle(setter) {
-    return (value) =>
-      setter((current) =>
-        current.includes(value)
-          ? current.filter((item) => item !== value)
-          : [...current, value],
-      );
-  }
 
   const categories = useMemo(
     () => [...new Set(models.map((model) => model.category))],
@@ -78,10 +116,25 @@ export default function Explore() {
     (maxPrice < priceCeiling ? 1 : 0);
 
   function clearFilters() {
-    setSelectedCategories([]);
-    setSelectedProviders([]);
-    setSelectedPrivacy([]);
-    setMaxPrice(priceCeiling);
+    setSearchParams(
+      (current) => {
+        const params = new URLSearchParams(current);
+        params.delete("cat");
+        params.delete("prov");
+        params.delete("privacy");
+        params.delete("max");
+        return params;
+      },
+      { replace: true },
+    );
+  }
+
+  function handleMaxPriceChange(value) {
+    if (value >= priceCeiling) {
+      updateParam("max", "");
+    } else {
+      updateParam("max", String(Math.round(value * 1e6) / 1e6));
+    }
   }
 
   const results = useMemo(() => {
@@ -102,8 +155,25 @@ export default function Explore() {
     if (trimmed) {
       return recommendModels(trimmed, candidates, { limit: 12 });
     }
+    if (sortBy === "downloads") {
+      return [...candidates].sort((a, b) => (b.downloads ?? 0) - (a.downloads ?? 0));
+    }
+    if (sortBy === "likes") {
+      return [...candidates].sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0));
+    }
+    if (sortBy === "price") {
+      return [...candidates].sort((a, b) => unitPrice(a) - unitPrice(b));
+    }
     return candidates;
-  }, [models, query, selectedCategories, selectedProviders, selectedPrivacy, maxPrice]);
+  }, [
+    models,
+    query,
+    sortBy,
+    selectedCategories,
+    selectedProviders,
+    selectedPrivacy,
+    maxPrice,
+  ]);
 
   return (
     <div className="relative min-h-screen bg-[#080C0E]">
@@ -126,19 +196,29 @@ export default function Explore() {
             </p>
           </div>
           <div className="w-full md:max-w-md">
-            <div className="flex items-center rounded-full border border-white/[0.1] bg-[#0E141B]/90 px-4 py-2 shadow-inner focus-within:border-[#00FF9D]/50 focus-within:shadow-[0_0_24px_-4px_rgba(0,255,157,0.25)] transition-all">
-              <span className="text-slate-500 mr-2.5">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </span>
-              <input
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search by task, provider, or keyword..."
-                className="w-full bg-transparent text-xs text-slate-100 placeholder:text-slate-500 outline-none"
-              />
+            <div className="flex items-center gap-2">
+              <Link
+                to="/compare"
+                className="hidden shrink-0 items-center gap-1 rounded-full border border-[#00FF9D]/40 bg-[#00FF9D]/[0.06] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-[#00FF9D] transition-all hover:bg-[#00FF9D]/15 hover:shadow-[0_0_20px_-4px_rgba(0,255,157,0.4)] sm:inline-flex"
+              >
+                Compare costs
+                <span>→</span>
+              </Link>
+              <div className="flex min-w-0 flex-1 items-center rounded-full border border-white/[0.1] bg-[#0E141B]/90 px-4 py-2 shadow-inner focus-within:border-[#00FF9D]/50 focus-within:shadow-[0_0_24px_-4px_rgba(0,255,157,0.25)] transition-all">
+                <span className="text-slate-500 mr-2.5">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </span>
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(event) => updateParam("q", event.target.value)}
+                  placeholder="Search by task, provider, or keyword..."
+                  aria-label="Search models"
+                  className="w-full bg-transparent text-xs text-slate-100 placeholder:text-slate-500 outline-none"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -169,64 +249,127 @@ export default function Explore() {
 
         {status === "ready" && (
           <div className="mt-8 grid items-start gap-8 lg:grid-cols-[270px_1fr]">
-            <FilterSidebar
-              categories={categories}
-              providers={providers}
-              privacyStandards={privacyStandards}
-              selectedCategories={selectedCategories}
-              selectedProviders={selectedProviders}
-              selectedPrivacy={selectedPrivacy}
-              onToggleCategory={toggle(setSelectedCategories)}
-              onToggleProvider={toggle(setSelectedProviders)}
-              onTogglePrivacy={toggle(setSelectedPrivacy)}
-              maxPrice={maxPrice}
-              priceCeiling={priceCeiling}
-              onMaxPriceChange={setMaxPrice}
-            />
-
-            <section>
-              <div className="mb-5 flex items-center justify-between">
-                <p className="font-mono text-xs text-slate-400">
-                  SHOWING <span className="font-bold text-white">{results.length}</span> MODEL{results.length === 1 ? "" : "S"}
-                </p>
-                {activeFilterCount > 0 && (
-                  <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="font-mono text-xs font-semibold text-[#00FF9D] transition-colors hover:text-emerald-300 cursor-pointer"
-                  >
-                    RESET FILTERS ({activeFilterCount})
-                  </button>
-                )}
-              </div>
-
-              {results.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-white/10 bg-[#0E141B]/40 p-16 text-center">
-                  <p className="text-sm font-semibold text-slate-300">
-                    No models match your current filters
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Try broadening your filters or clearing search terms.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="mt-4 rounded-full border border-white/10 bg-[#131B24] px-4 py-2 text-xs font-mono text-slate-300 hover:text-white cursor-pointer"
-                  >
-                    Clear all filters
-                  </button>
-                </div>
-              ) : (
-                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {results.map((model) => (
-                    <ModelCard key={model.id} model={model} />
-                  ))}
+            <div className="space-y-8 lg:contents">
+              {categories.length > 1 && (
+                <div className="lg:col-span-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="mr-1 font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                      Category:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => updateParam("cat", "")}
+                      aria-pressed={selectedCategories.length === 0}
+                      className={`rounded-full border px-3.5 py-1 font-mono text-[11px] font-semibold transition-all duration-200 cursor-pointer ${
+                        selectedCategories.length === 0
+                          ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)]"
+                          : "border-white/[0.08] bg-[#0E141B]/70 text-slate-400 hover:border-white/20 hover:text-white"
+                      }`}
+                    >
+                      All
+                    </button>
+                    {categories.map((category) => {
+                      const active = selectedCategories.includes(category);
+                      return (
+                        <button
+                          key={category}
+                          type="button"
+                          onClick={() => toggleListParam("cat")(category)}
+                          aria-pressed={active}
+                          className={`rounded-full border px-3.5 py-1 font-mono text-[11px] font-semibold transition-all duration-200 cursor-pointer ${
+                            active
+                              ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)]"
+                              : "border-white/[0.08] bg-[#0E141B]/70 text-slate-400 hover:border-white/20 hover:text-white"
+                          }`}
+                        >
+                          {category}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
-            </section>
+
+              <FilterSidebar
+                categories={categories}
+                providers={providers}
+                privacyStandards={privacyStandards}
+                selectedCategories={selectedCategories}
+                selectedProviders={selectedProviders}
+                selectedPrivacy={selectedPrivacy}
+                onToggleCategory={toggleListParam("cat")}
+                onToggleProvider={toggleListParam("prov")}
+                onTogglePrivacy={toggleListParam("privacy")}
+                maxPrice={maxPrice}
+                priceCeiling={priceCeiling}
+                onMaxPriceChange={handleMaxPriceChange}
+              />
+
+              <section>
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                  <p className="font-mono text-xs text-slate-400">
+                    SHOWING <span className="font-bold text-white">{results.length}</span> MODEL{results.length === 1 ? "" : "S"}
+                  </p>
+                  <div className="flex items-center gap-4">
+                    {activeFilterCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={clearFilters}
+                        className="font-mono text-xs font-semibold text-[#00FF9D] transition-colors hover:text-emerald-300 cursor-pointer"
+                      >
+                        RESET FILTERS ({activeFilterCount})
+                      </button>
+                    )}
+                    <label
+                      htmlFor="explore-sort"
+                      className="font-mono text-[10px] uppercase tracking-wider text-slate-500"
+                    >
+                      Sort
+                    </label>
+                    <select
+                      id="explore-sort"
+                      value={sortBy}
+                      onChange={(event) => updateParam("sort", event.target.value === "trending" ? "" : event.target.value)}
+                      className="rounded-full border border-white/[0.1] bg-[#0E141B]/90 px-3 py-1.5 font-mono text-xs text-slate-200 outline-none transition focus:border-[#00FF9D]/50 cursor-pointer"
+                    >
+                      {SORT_OPTIONS.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {results.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-white/10 bg-[#0E141B]/40 p-16 text-center">
+                    <p className="text-sm font-semibold text-slate-300">
+                      No models match your current filters
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Try broadening your filters or clearing search terms.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={clearFilters}
+                      className="mt-4 rounded-full border border-white/10 bg-[#131B24] px-4 py-2 text-xs font-mono text-slate-300 hover:text-white cursor-pointer"
+                    >
+                      Clear all filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {results.map((model) => (
+                      <ModelCard key={model.id} model={model} />
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
           </div>
         )}
       </div>
     </div>
   );
 }
+

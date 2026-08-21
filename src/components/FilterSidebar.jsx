@@ -45,7 +45,7 @@ export default function FilterSidebar({
   onMaxPriceChange,
 }) {
   return (
-    <aside className="h-fit space-y-6 rounded-2xl border border-white/[0.08] bg-[#0E141B]/90 p-6 backdrop-blur-md lg:sticky lg:top-24 shadow-xl">
+    <aside className="h-fit space-y-6 rounded-2xl border border-white/[0.08] bg-[#0E141B]/90 p-6 backdrop-blur-md shadow-xl lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
       <div className="flex items-center justify-between border-b border-white/[0.07] pb-4">
         <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">Filters</h2>
         <span className="flex h-2 w-2 rounded-full bg-[#00FF9D] shadow-[0_0_6px_#00FF9D]" />
