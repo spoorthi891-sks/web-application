@@ -1,7 +1,106 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import AuthModal from "../components/AuthModal.jsx";
+import Sparkline from "../components/Sparkline.jsx";
 import { signOut, useAuth } from "../utils/auth.js";
+
+const USAGE_DAYS = 14;
+
+function hashString(value) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function mulberry32(seed) {
+  let state = seed;
+  return function next() {
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function buildUsageSeries(seedKey, base, growth = 0.55) {
+  const random = mulberry32(hashString(seedKey));
+  const today = new Date();
+  return Array.from({ length: USAGE_DAYS }, (_, index) => {
+    const day = new Date(today);
+    day.setDate(day.getDate() - (USAGE_DAYS - 1 - index));
+    const weekendDip = [0, 6].includes(day.getDay()) ? 0.45 : 1;
+    const trend = 1 + (index / (USAGE_DAYS - 1)) * growth;
+    const jitter = 0.72 + random() * 0.56;
+    return Math.max(1, Math.round(base * trend * jitter * weekendDip));
+  });
+}
+
+function sumSeries(seriesList) {
+  if (seriesList.length === 0) return [];
+  return seriesList[0].map((_, index) =>
+    seriesList.reduce((total, series) => total + series[index], 0),
+  );
+}
+
+function seriesTotal(series) {
+  return series.reduce((total, value) => total + value, 0);
+}
+
+function seriesDelta(series) {
+  const half = Math.floor(series.length / 2);
+  const previous = series.slice(0, half).reduce((a, b) => a + b, 0) || 1;
+  const current = series.slice(half).reduce((a, b) => a + b, 0);
+  return Math.round(((current - previous) / previous) * 100);
+}
+
+const compactFormatter = new Intl.NumberFormat("en-US", { notation: "compact" });
+
+function formatCompact(value) {
+  return compactFormatter.format(value ?? 0);
+}
+
+function DeltaBadge({ value }) {
+  const isUp = value >= 0;
+  return (
+    <span
+      className={`rounded-full border px-2 py-0.5 font-mono text-[10px] font-semibold ${
+        isUp
+          ? "border-emerald-500/30 bg-emerald-500/10 text-[#00FF9D]"
+          : "border-rose-500/30 bg-rose-500/10 text-rose-300"
+      }`}
+    >
+      {isUp ? "▲" : "▼"} {Math.abs(value)}%
+    </span>
+  );
+}
+
+function UsagePanel({ label, unit, series, stroke }) {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-5 shadow-lg backdrop-blur-md">
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+          {label}
+        </span>
+        <DeltaBadge value={seriesDelta(series)} />
+      </div>
+      <p className="mt-2 font-mono text-2xl font-bold text-white">
+        {formatCompact(seriesTotal(series))}
+        <span className="ml-1 text-[10px] font-medium uppercase tracking-wider text-slate-500">
+          {unit} · 14D
+        </span>
+      </p>
+      <Sparkline
+        points={series}
+        stroke={stroke}
+        label={`${label} over the last ${USAGE_DAYS} days`}
+        className="mt-3 h-16 w-full"
+      />
+    </div>
+  );
+}
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -16,6 +115,39 @@ export default function Account() {
   const [authOpen, setAuthOpen] = useState(false);
   const [revealed, setRevealed] = useState({});
   const [copiedId, setCopiedId] = useState(null);
+
+  const usageByKey = useMemo(
+    () =>
+      Object.fromEntries(
+        apiKeys.map((entry) => {
+          const seed = hashString(entry.id);
+          const requestBase = 400 + (seed % 2600);
+          const tokensPerRequest = 300 + ((seed >> 5) % 2200);
+          return [
+            entry.id,
+            {
+              requests: buildUsageSeries(`${entry.id}:requests`, requestBase),
+              tokens: buildUsageSeries(
+                `${entry.id}:tokens`,
+                requestBase * tokensPerRequest,
+                0.7,
+              ),
+            },
+          ];
+        }),
+      ),
+    [apiKeys],
+  );
+
+  const workspaceUsage = useMemo(() => {
+    const entries = apiKeys
+      .map((entry) => usageByKey[entry.id])
+      .filter(Boolean);
+    return {
+      requests: sumSeries(entries.map((usage) => usage.requests)),
+      tokens: sumSeries(entries.map((usage) => usage.tokens)),
+    };
+  }, [apiKeys, usageByKey]);
 
   if (!session) {
     return (
@@ -104,6 +236,98 @@ export default function Account() {
             </div>
           ))}
         </dl>
+
+        <section className="mt-12">
+          <div className="mb-5 flex items-end justify-between">
+            <h2 className="text-xl font-bold tracking-tight text-white">Usage</h2>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+              SIMULATED TELEMETRY · LAST {USAGE_DAYS} DAYS
+            </span>
+          </div>
+
+          {apiKeys.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-white/10 bg-[#0E141B]/40 px-5 py-6 text-center font-mono text-xs text-slate-500">
+              USAGE CHARTS APPEAR ONCE YOUR KEYS START SERVING TRAFFIC
+            </p>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid gap-4 lg:grid-cols-2">
+                <UsagePanel
+                  label="Requests / day · all keys"
+                  unit="REQ"
+                  series={workspaceUsage.requests}
+                  stroke="#00FF9D"
+                />
+                <UsagePanel
+                  label="Tokens / day · all keys"
+                  unit="TOK"
+                  series={workspaceUsage.tokens}
+                  stroke="#34d399"
+                />
+              </div>
+
+              {apiKeys.map((entry) => {
+                const usage = usageByKey[entry.id];
+                if (!usage) return null;
+                return (
+                  <div
+                    key={entry.id}
+                    className="rounded-2xl border border-white/[0.06] bg-[#0E141B]/60 p-4 sm:p-5"
+                  >
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#00FF9D]/70" />
+                        <span className="truncate font-mono text-[11px] uppercase tracking-wider text-slate-400">
+                          {entry.model}
+                        </span>
+                      </span>
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                        KEY …{entry.key.slice(-6).toLowerCase()}
+                      </span>
+                    </div>
+                    <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                      {[
+                        {
+                          label: "Requests",
+                          unit: "/day",
+                          series: usage.requests,
+                          stroke: "#00FF9D",
+                        },
+                        {
+                          label: "Tokens",
+                          unit: "/day",
+                          series: usage.tokens,
+                          stroke: "#34d399",
+                        },
+                      ].map(({ label, unit, series, stroke }) => (
+                        <div key={label}>
+                          <div className="mb-1 flex items-baseline justify-between gap-2">
+                            <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                              {label}{" "}
+                              <span className="text-slate-600">{unit}</span>
+                            </span>
+                            <span className="font-mono text-xs font-bold text-slate-200">
+                              {formatCompact(seriesTotal(series))}
+                              <span className="ml-1 text-[9px] font-medium text-slate-500">
+                                14D
+                              </span>
+                            </span>
+                          </div>
+                          <Sparkline
+                            points={series}
+                            stroke={stroke}
+                            label={`${label} per day for key ending ${entry.key.slice(-4)}`}
+                            className="h-10 w-full"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
 
         <section className="mt-12">
           <div className="mb-5 flex items-end justify-between">

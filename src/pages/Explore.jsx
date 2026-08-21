@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { fetchTrendingModels } from "../utils/hfHub.js";
 import { recommendModels, unitPrice } from "../utils/matchmakerAlgo.js";
 import ModelCard from "../components/ModelCard.jsx";
@@ -19,9 +19,22 @@ function readListParam(searchParams, key) {
 
 export default function Explore() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchInputRef = useRef(null);
+  const didAutoFocusRef = useRef(false);
   const [models, setModels] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
+
+  // Focus the search box when arriving via the "/" shortcut
+  useEffect(() => {
+    if (!didAutoFocusRef.current && location.state?.autoFocusSearch) {
+      didAutoFocusRef.current = true;
+      searchInputRef.current?.focus();
+      navigate(`/explore${location.search}`, { replace: true });
+    }
+  }, [location, navigate]);
 
   // Single source of truth: the URL. Every filter is a shareable param.
   const query = searchParams.get("q") ?? "";
@@ -211,6 +224,8 @@ export default function Explore() {
                   </svg>
                 </span>
                 <input
+                  ref={searchInputRef}
+                  id="explore-search"
                   type="search"
                   value={query}
                   onChange={(event) => updateParam("q", event.target.value)}
@@ -218,6 +233,12 @@ export default function Explore() {
                   aria-label="Search models"
                   className="w-full bg-transparent text-xs text-slate-100 placeholder:text-slate-500 outline-none"
                 />
+                <kbd
+                  aria-hidden="true"
+                  className="ml-2 hidden shrink-0 rounded border border-white/10 bg-[#080C0E] px-1.5 py-0.5 font-mono text-[10px] leading-none text-slate-500 sm:inline-block"
+                >
+                  /
+                </kbd>
               </div>
             </div>
           </div>
@@ -330,7 +351,7 @@ export default function Explore() {
                       id="explore-sort"
                       value={sortBy}
                       onChange={(event) => updateParam("sort", event.target.value === "trending" ? "" : event.target.value)}
-                      className="rounded-full border border-white/[0.1] bg-[#0E141B]/90 px-3 py-1.5 font-mono text-xs text-slate-200 outline-none transition focus:border-[#00FF9D]/50 cursor-pointer"
+                      className="select-dark rounded-full border border-white/[0.1] bg-[#0E141B]/90 py-1.5 pl-3.5 pr-8 font-mono text-xs text-slate-200 outline-none transition hover:border-white/25 focus:border-[#00FF9D]/50 focus:shadow-[0_0_16px_-4px_rgba(0,255,157,0.35)] cursor-pointer"
                     >
                       {SORT_OPTIONS.map((option) => (
                         <option key={option.id} value={option.id}>

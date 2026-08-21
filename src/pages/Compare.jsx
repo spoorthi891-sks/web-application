@@ -1,9 +1,33 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { MODELS, getModelById } from "../data/modelsRegistry.js";
-import { compareMonthlyCosts, formatUSD, formatTokenCount } from "../utils/costCalculator.js";
+import {
+  compareMonthlyCosts,
+  estimateMonthlyCost,
+  formatUSD,
+  formatTokenCount,
+  isRequestPriced,
+} from "../utils/costCalculator.js";
 
 const DEFAULT_SELECTION = ["atlas-70b", "nova-mini", "forge-coder-34b"];
+const MAX_SELECTION = 3;
+
+function findExtreme(models, valueFn, direction) {
+  let best = null;
+  let bestValue = null;
+  for (const model of models) {
+    const value = valueFn(model);
+    if (value == null) continue;
+    if (
+      bestValue == null ||
+      (direction === "min" ? value < bestValue : value > bestValue)
+    ) {
+      best = model;
+      bestValue = value;
+    }
+  }
+  return best?.id ?? null;
+}
 
 function TrafficSlider({ id, label, min, max, step, value, onChange, hint }) {
   return (
@@ -32,6 +56,44 @@ function TrafficSlider({ id, label, min, max, step, value, onChange, hint }) {
   );
 }
 
+function SpecRow({ label, hint, children }) {
+  return (
+    <tr className="border-t border-white/[0.06] transition-colors hover:bg-white/[0.02]">
+      <th
+        scope="row"
+        className="sticky left-0 z-10 bg-[#10171F] px-5 py-3.5 align-top"
+      >
+        <span className="block font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+          {label}
+        </span>
+        {hint && (
+          <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-wider text-slate-500">
+            {hint}
+          </span>
+        )}
+      </th>
+      {children}
+    </tr>
+  );
+}
+
+function SpecValue({ raw, isBest, big = false }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-2 ${
+        big ? "text-base" : "text-sm"
+      } font-mono font-bold ${isBest ? "text-[#00FF9D]" : "text-white"}`}
+    >
+      {raw}
+      {isBest && (
+        <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-widest">
+          Best
+        </span>
+      )}
+    </span>
+  );
+}
+
 export default function Compare() {
   const [selectedIds, setSelectedIds] = useState(DEFAULT_SELECTION);
   const [monthlyRequests, setMonthlyRequests] = useState(250000);
@@ -42,9 +104,38 @@ export default function Compare() {
     [monthlyRequests, avgTokensPerRequest],
   );
 
+  const selectedModels = useMemo(
+    () => selectedIds.map(getModelById).filter(Boolean),
+    [selectedIds],
+  );
+
   const comparison = useMemo(
-    () => compareMonthlyCosts(selectedIds.map(getModelById).filter(Boolean), traffic),
-    [selectedIds, traffic],
+    () => compareMonthlyCosts(selectedModels, traffic),
+    [selectedModels, traffic],
+  );
+
+  const monthlyById = useMemo(
+    () =>
+      Object.fromEntries(
+        selectedModels.map((model) => [
+          model.id,
+          estimateMonthlyCost(model, traffic),
+        ]),
+      ),
+    [selectedModels, traffic],
+  );
+
+  const fastestId = useMemo(
+    () => findExtreme(selectedModels, (m) => m.latencyMs, "min"),
+    [selectedModels],
+  );
+  const sharpestId = useMemo(
+    () => findExtreme(selectedModels, (m) => m.benchmarkScore, "max"),
+    [selectedModels],
+  );
+  const thriftiestId = useMemo(
+    () => findExtreme(selectedModels, (m) => monthlyById[m.id], "min"),
+    [selectedModels],
   );
 
   const maxCost = comparison.length ? comparison[comparison.length - 1].monthlyCost : 0;
@@ -55,11 +146,13 @@ export default function Compare() {
       : null;
 
   function toggleModel(id) {
-    setSelectedIds((current) =>
-      current.includes(id)
-        ? current.filter((entry) => entry !== id)
-        : [...current, id],
-    );
+    setSelectedIds((current) => {
+      if (current.includes(id)) {
+        return current.filter((entry) => entry !== id);
+      }
+      if (current.length >= MAX_SELECTION) return current;
+      return [...current, id];
+    });
   }
 
   return (
@@ -71,15 +164,147 @@ export default function Compare() {
       <div className="relative mx-auto max-w-7xl px-6 py-12">
         <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-[10px] font-semibold tracking-widest text-[#00FF9D] uppercase">
           <span className="h-1.5 w-1.5 rounded-full bg-[#00FF9D] animate-pulse" />
-          COST COMPARISON ENGINE
+          MODEL COMPARISON ENGINE
         </div>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-          Compare <span className="text-[#00FF9D]">monthly spend</span> across models
+          Compare models <span className="text-[#00FF9D]">side by side</span>
         </h1>
         <p className="mt-1.5 max-w-2xl text-xs text-slate-400 sm:text-sm">
-          Project your workload traffic against list prices for every selected
-          model. Rankings update live — before finance or procurement gets involved.
+          Line up 2–{MAX_SELECTION} models on latency, benchmark score, and pricing —
+          then project your workload traffic to see monthly spend before finance gets involved.
         </p>
+
+        {/* Side-by-side spec comparison (2–3 models) */}
+        <section className="mt-8">
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+              Side-by-side specs
+            </h2>
+            {selectedModels.length > 0 && (
+              <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                BEST IN ROW MARKED · TRAFFIC AT{" "}
+                {formatTokenCount(monthlyRequests)} REQ/MO ×{" "}
+                {formatTokenCount(avgTokensPerRequest)} TOK
+              </p>
+            )}
+          </div>
+
+          {selectedModels.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-white/10 bg-[#0E141B]/40 p-12 text-center">
+              <p className="text-sm font-semibold text-slate-300">
+                Nothing to compare yet
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Select 2–{MAX_SELECTION} models from the panel below to line up
+                latency, price, and benchmark scores.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 shadow-xl backdrop-blur-md">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[680px] border-collapse text-left">
+                  <thead>
+                    <tr className="border-b border-white/[0.08]">
+                      <th
+                        scope="col"
+                        className="sticky left-0 z-10 bg-[#10171F] px-5 py-4 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+                      >
+                        Metric
+                      </th>
+                      {selectedModels.map((model) => (
+                        <th
+                          key={model.id}
+                          scope="col"
+                          className="px-5 py-4 align-bottom"
+                        >
+                          <Link
+                            to={`/models/${encodeURIComponent(model.id)}`}
+                            className="group block"
+                          >
+                            <span className="block text-sm font-bold text-white transition-colors group-hover:text-[#00FF9D]">
+                              {model.name}
+                            </span>
+                            <span className="mt-0.5 flex items-center gap-2">
+                              <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500 group-hover:text-slate-400">
+                                {model.provider}
+                              </span>
+                              <span className="rounded-full border border-white/[0.08] bg-[#080C0E] px-2 py-0.5 font-mono text-[9px] text-slate-400">
+                                {model.category}
+                              </span>
+                            </span>
+                          </Link>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <SpecRow label="Latency (median)" hint="Lower is better">
+                      {selectedModels.map((model) => (
+                        <td key={model.id} className="px-5 py-3.5">
+                          <SpecValue
+                            raw={`${model.latencyMs} ms`}
+                            isBest={model.id === fastestId && selectedModels.length > 1}
+                          />
+                        </td>
+                      ))}
+                    </SpecRow>
+                    <SpecRow label="Benchmark score" hint="Higher is better">
+                      {selectedModels.map((model) => (
+                        <td key={model.id} className="px-5 py-3.5">
+                          <SpecValue
+                            raw={model.benchmarkScore.toFixed(1)}
+                            isBest={model.id === sharpestId && selectedModels.length > 1}
+                          />
+                        </td>
+                      ))}
+                    </SpecRow>
+                    <SpecRow label="List pricing" hint="Per request or per 1K tokens">
+                      {selectedModels.map((model) => (
+                        <td key={model.id} className="px-5 py-3.5">
+                          <span className="font-mono text-xs text-slate-300">
+                            {isRequestPriced(model)
+                              ? `${formatUSD(model.pricingPerRequest)} / req`
+                              : `${formatUSD(model.pricingPer1kTokens)} / 1K tok`}
+                          </span>
+                        </td>
+                      ))}
+                    </SpecRow>
+                    <SpecRow label={`Est. monthly @ ${formatTokenCount(monthlyRequests)} req`} hint="At current traffic sliders">
+                      {selectedModels.map((model) => (
+                        <td key={model.id} className="px-5 py-3.5">
+                          <SpecValue
+                            raw={formatUSD(monthlyById[model.id])}
+                            isBest={model.id === thriftiestId && selectedModels.length > 1}
+                            big
+                          />
+                        </td>
+                      ))}
+                    </SpecRow>
+                    <SpecRow label="Privacy posture" hint="Compliance certifications">
+                      {selectedModels.map((model) => (
+                        <td key={model.id} className="px-5 py-3.5">
+                          <span className="font-mono text-[11px] leading-relaxed text-slate-400">
+                            {model.privacyRating.split("·").map((part, partIndex) => (
+                              <span key={part} className="mr-2 inline-flex items-center gap-1.5">
+                                {partIndex > 0 && <span className="text-slate-600">·</span>}
+                                {part.trim()}
+                              </span>
+                            ))}
+                          </span>
+                        </td>
+                      ))}
+                    </SpecRow>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {selectedModels.length === 1 && (
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-wider text-slate-500">
+              ADD ONE MORE MODEL TO UNLOCK BEST-IN-ROW HIGHLIGHTS
+            </p>
+          )}
+        </section>
 
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[380px_1fr]">
           {/* Assumptions panel */}
@@ -121,22 +346,31 @@ export default function Compare() {
                   Models in scope
                 </span>
                 <span className="font-mono text-xs font-bold text-[#00FF9D]">
-                  {selectedIds.length}/{MODELS.length}
+                  {selectedIds.length}/{MAX_SELECTION}
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {MODELS.map((model) => {
                   const active = selectedIds.includes(model.id);
+                  const capped = !active && selectedIds.length >= MAX_SELECTION;
                   return (
                     <button
                       key={model.id}
                       type="button"
                       onClick={() => toggleModel(model.id)}
                       aria-pressed={active}
-                      className={`rounded-full border px-3 py-1 font-mono text-[11px] font-semibold transition-all duration-200 cursor-pointer ${
+                      aria-disabled={capped}
+                      title={
+                        capped
+                          ? `Max ${MAX_SELECTION} models — remove one to swap`
+                          : undefined
+                      }
+                      className={`rounded-full border px-3 py-1 font-mono text-[11px] font-semibold transition-all duration-200 ${
                         active
-                          ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)]"
-                          : "border-white/[0.08] bg-[#080C0E]/70 text-slate-400 hover:border-white/20 hover:text-white"
+                          ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)] cursor-pointer"
+                          : capped
+                            ? "border-white/[0.06] bg-[#080C0E]/70 text-slate-600 cursor-not-allowed"
+                            : "border-white/[0.08] bg-[#080C0E]/70 text-slate-400 hover:border-white/20 hover:text-white cursor-pointer"
                       }`}
                     >
                       {model.name}
@@ -144,16 +378,19 @@ export default function Compare() {
                   );
                 })}
               </div>
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                Pick 2–{MAX_SELECTION} models for side-by-side specs
+              </p>
               <button
                 type="button"
                 onClick={() =>
                   setSelectedIds(
-                    selectedIds.length === MODELS.length ? [] : MODELS.map((m) => m.id),
+                    selectedIds.length === 0 ? DEFAULT_SELECTION : [],
                   )
                 }
                 className="mt-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 transition-colors hover:text-[#00FF9D] cursor-pointer"
               >
-                {selectedIds.length === MODELS.length ? "CLEAR ALL" : "SELECT ALL"}
+                {selectedIds.length === 0 ? "RESTORE DEFAULTS" : "CLEAR ALL"}
               </button>
             </div>
           </section>

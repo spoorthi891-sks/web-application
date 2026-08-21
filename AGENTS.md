@@ -20,10 +20,10 @@ npm run build   # production build — run this to verify changes
 
 ## Project layout
 
-- `src/pages/` — Home, Explore, ModelDetails, Checkout, Sandbox
-- `src/components/` — Navbar, ModelCard, FilterSidebar, PricingSection, CodeGenerator, SkeletonCard, HfModelDetail
-- `src/utils/` — costCalculator, pricingPlans, matchmakerAlgo, hfHub (Hugging Face API)
-- Routes: `/`, `/explore`, `/models/:id`, `/models/:id/checkout`, `/sandbox`
+- `src/pages/` — Home, Explore, ModelDetails, Checkout, Sandbox, Matchmaker, Compare, Account, Docs, NotFound
+- `src/components/` — Navbar, Footer, ModelCard, FilterSidebar, PricingSection, CodeGenerator, SkeletonCard, HfModelDetail, AuthModal, ErrorBoundary, Sparkline
+- `src/utils/` — costCalculator, pricingPlans, matchmakerAlgo, hfHub (Hugging Face API), auth
+- Routes: `/`, `/explore`, `/matchmaker`, `/compare`, `/models/:id`, `/models/:id/checkout`, `/sandbox`, `/account`, `/docs`, `*` (404)
 
 ## Design language
 

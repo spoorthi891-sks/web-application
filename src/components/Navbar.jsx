@@ -8,6 +8,7 @@ const LINKS = [
   { to: "/explore", label: "Explore" },
   { to: "/matchmaker", label: "Matchmaker" },
   { to: "/sandbox", label: "Sandbox" },
+  { to: "/docs", label: "Docs" },
 ];
 
 export default function Navbar() {

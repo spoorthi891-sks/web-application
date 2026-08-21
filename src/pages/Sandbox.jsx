@@ -11,6 +11,40 @@ import {
 const CHUNK_INTERVAL_MS = 14;
 const CHUNK_SIZE = 10;
 
+const HISTORY_KEY = "highrise_run_history";
+const MAX_HISTORY = 8;
+
+function readHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeHistory(entries) {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+  } catch {
+    // storage unavailable — history stays in-memory for this session
+  }
+}
+
+function formatTimeAgo(iso) {
+  const seconds = Math.round((Date.now() - Date.parse(iso)) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
 const STOP_WORDS = new Set([
   "the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "with",
   "this", "that", "these", "those", "please", "can", "could", "would",
@@ -311,17 +345,12 @@ export default function Sandbox() {
     totalMs: null,
   });
   const [elapsedMs, setElapsedMs] = useState(0);
+  const [history, setHistory] = useState(readHistory);
   const timersRef = useRef([]);
   const elapsedRef = useRef(0);
 
   const model = catalog.find((m) => m.id === modelId) ?? catalog[0];
   const isRunning = run.status === "connecting" || run.status === "streaming";
-
-  useEffect(() => {
-    if (requestedId && catalog.some((m) => m.id === requestedId) && modelId !== requestedId) {
-      setModelId(requestedId);
-    }
-  }, [catalog, requestedId]);
 
   const inputTokens = Math.ceil(prompt.trim().length / 4);
   const outputTokens = Math.ceil(run.output.length / 4);
@@ -338,6 +367,25 @@ export default function Sandbox() {
 
   useEffect(() => () => clearTimers(), []);
 
+  function resetRunState() {
+    clearTimers();
+    elapsedRef.current = 0;
+    setElapsedMs(0);
+    setRun({ status: "idle", output: "", ttfbMs: null, totalMs: null });
+  }
+
+  useEffect(() => {
+    if (
+      requestedId &&
+      catalog.some((m) => m.id === requestedId) &&
+      modelId !== requestedId
+    ) {
+      resetRunState();
+      setModelId(requestedId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalog, requestedId]);
+
   useEffect(() => {
     if (!isRunning) return undefined;
     const startedAt = performance.now() - elapsedRef.current;
@@ -347,13 +395,6 @@ export default function Sandbox() {
     }, 24);
     return () => clearInterval(tick);
   }, [isRunning]);
-
-  useEffect(() => {
-    clearTimers();
-    elapsedRef.current = 0;
-    setElapsedMs(0);
-    setRun({ status: "idle", output: "", ttfbMs: null, totalMs: null });
-  }, [modelId]);
 
   const estimatedCost = useMemo(
     () =>
@@ -371,6 +412,54 @@ export default function Sandbox() {
     run.totalMs > run.ttfbMs
       ? Math.round(outputTokens / ((run.totalMs - run.ttfbMs) / 1000))
       : null;
+
+  function recordRun(finalText, ttfb, totalMs) {
+    const entry = {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
+      modelId: model.id,
+      modelName: model.name,
+      promptExcerpt: excerpt(prompt, 90),
+      ttfbMs: ttfb,
+      totalMs,
+      outputTokens: Math.ceil(finalText.length / 4),
+      cost: estimateCost(
+        model,
+        isRequestPriced(model)
+          ? 1
+          : Math.max(1, Math.ceil(prompt.trim().length / 4)) +
+              Math.ceil(finalText.length / 4),
+      ),
+      createdAt: new Date().toISOString(),
+      output: finalText,
+    };
+    setHistory((current) => {
+      const next = [entry, ...current].slice(0, MAX_HISTORY);
+      writeHistory(next);
+      return next;
+    });
+  }
+
+  function handleRestore(entry) {
+    clearTimers();
+    setRun({
+      status: "done",
+      output: entry.output,
+      ttfbMs: entry.ttfbMs,
+      totalMs: entry.totalMs,
+    });
+  }
+
+  function handleClearHistory() {
+    setHistory(() => {
+      writeHistory([]);
+      return [];
+    });
+  }
+
+  function handleModelChange(event) {
+    resetRunState();
+    setModelId(event.target.value);
+  }
 
   function handleRun(event) {
     event.preventDefault();
@@ -403,6 +492,9 @@ export default function Sandbox() {
       function emitChunk() {
         index += 1;
         const done = index >= chunks.length;
+        if (done) {
+          recordRun(chunks.slice(0, index).join(""), ttfb, elapsedRef.current);
+        }
         setRun((current) => ({
           ...current,
           output: chunks.slice(0, index).join(""),
@@ -470,8 +562,8 @@ export default function Sandbox() {
               <select
                 id="sandbox-model"
                 value={modelId}
-                onChange={(event) => setModelId(event.target.value)}
-                className="w-full rounded-xl border border-white/[0.1] bg-[#080C0E] px-4 py-2.5 font-mono text-xs text-slate-100 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+                onChange={handleModelChange}
+                className="select-dark w-full appearance-none rounded-xl border border-white/[0.1] bg-[#080C0E] py-2.5 pl-4 pr-9 font-mono text-xs text-slate-100 outline-none transition hover:border-white/20 focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)] cursor-pointer"
               >
                 {catalog.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -530,7 +622,7 @@ export default function Sandbox() {
               <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">Stream Output</h2>
               <div className="flex items-center gap-2">
                 <span className="rounded-full border border-white/[0.08] bg-[#080C0E] px-3 py-1 font-mono text-[10px] text-slate-400">
-                  POST /v1/invoke
+                  POST /v1/run
                 </span>
                 <span
                   className={`rounded-full border px-3 py-1 font-mono text-[10px] font-bold ${STATUS_STYLES[run.status]}`}
@@ -584,6 +676,91 @@ export default function Sandbox() {
             </p>
           </section>
         </div>
+
+        {/* Run history */}
+        <section className="mt-10">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+              Run history
+              <span className="ml-2 font-normal text-slate-500">
+                ({history.length}/{MAX_HISTORY})
+              </span>
+            </h2>
+            {history.length > 0 && (
+              <button
+                type="button"
+                onClick={handleClearHistory}
+                className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 transition-colors hover:text-rose-300 cursor-pointer"
+              >
+                Clear history
+              </button>
+            )}
+          </div>
+
+          {history.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-white/10 bg-[#0E141B]/40 px-6 py-8 text-center">
+              <p className="font-mono text-xs text-slate-500">
+                COMPLETED RUNS ARE ARCHIVED HERE — RESTORE ANY PAST RESPONSE TO
+                RE-INSPECT ITS OUTPUT AND METRICS
+              </p>
+            </div>
+          ) : (
+            <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {history.map((entry) => (
+                <li
+                  key={entry.id}
+                  className="flex flex-col rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#00FF9D]/40"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#00FF9D] shadow-[0_0_8px_#00FF9D]" />
+                      <span className="truncate text-xs font-bold text-white">
+                        {entry.modelName}
+                      </span>
+                    </span>
+                    <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                      {formatTimeAgo(entry.createdAt)}
+                    </span>
+                  </div>
+
+                  <p className="mt-2 line-clamp-2 min-h-[2rem] text-[11px] leading-relaxed text-slate-400">
+                    {entry.promptExcerpt || "(empty prompt)"}
+                  </p>
+
+                  <dl className="mt-3 grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.06]">
+                    {[
+                      { label: "TTFB", value: `${entry.ttfbMs} ms` },
+                      { label: "Total", value: `${entry.totalMs} ms` },
+                      { label: "Tok", value: String(entry.outputTokens) },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="bg-[#080C0E] px-2.5 py-2">
+                        <dd className="font-mono text-[11px] font-bold text-slate-200">
+                          {value}
+                        </dd>
+                        <dt className="font-mono text-[9px] uppercase tracking-wider text-slate-500">
+                          {label}
+                        </dt>
+                      </div>
+                    ))}
+                  </dl>
+
+                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                      COST {formatUSD(entry.cost)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRestore(entry)}
+                      className="rounded-full border border-white/10 bg-[#080C0E] px-4 py-1.5 font-mono text-[11px] font-semibold text-slate-300 transition hover:border-[#00FF9D]/50 hover:text-[#00FF9D] cursor-pointer"
+                    >
+                      Restore →
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
     </div>
   );
