@@ -79,25 +79,32 @@ export default function CodeGenerator({ model }) {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-white/5 bg-slate-900/60">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 px-5 py-3">
-        <div>
-          <h2 className="text-sm font-semibold text-white">
-            Integration snippet
-          </h2>
-          <p className="mt-0.5 text-xs text-slate-500">
-            {model.name} · {model.provider}
-          </p>
+    <section className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#12181F]/90 shadow-xl backdrop-blur-md">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] bg-[#0E1319] px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#00FF9D]/80" />
+          </div>
+          <div>
+            <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+              INTEGRATION CLIENT SDK
+            </h2>
+            <p className="font-mono text-[10px] text-slate-400">
+              {model.name} · {model.provider}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-1 rounded-lg bg-slate-950/60 p-1">
+        <div className="flex items-center gap-1 rounded-full border border-white/[0.08] bg-[#0B0F12] p-1">
           {LANGUAGES.map((lang) => (
             <button
               key={lang}
               type="button"
               onClick={() => setLanguage(lang)}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition ${
+              className={`rounded-full px-3.5 py-1 font-mono text-[11px] font-medium transition-all ${
                 language === lang
-                  ? "bg-cyan-400/15 text-cyan-300"
+                  ? "bg-white/15 text-white shadow-sm border border-white/10"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -107,16 +114,16 @@ export default function CodeGenerator({ model }) {
         </div>
       </header>
 
-      <div className="relative">
-        <pre className="overflow-x-auto p-5 text-xs leading-relaxed text-emerald-300/90">
+      <div className="relative bg-[#070A0D]">
+        <pre className="overflow-x-auto p-6 font-mono text-xs leading-relaxed text-[#00FF9D]">
           <code>{snippet}</code>
         </pre>
         <button
           type="button"
           onClick={handleCopy}
-          className="absolute right-4 top-4 rounded-md border border-white/10 bg-slate-950/80 px-2.5 py-1 text-xs text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-300"
+          className="absolute right-4 top-4 rounded-full border border-white/15 bg-[#12181F]/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-slate-200 shadow-md backdrop-blur-md transition-all hover:border-[#00FF9D]/50 hover:text-[#00FF9D]"
         >
-          {copied ? "Copied" : "Copy"}
+          {copied ? "COPIED ✓" : "COPY SNIPPET"}
         </button>
       </div>
     </section>

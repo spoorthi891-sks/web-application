@@ -144,8 +144,8 @@ function buildMockResponse(model, prompt, ttfbMs) {
 const STATUS_STYLES = {
   idle: "border-white/10 bg-white/5 text-slate-400",
   connecting: "border-amber-400/30 bg-amber-400/10 text-amber-300",
-  streaming: "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
-  done: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+  streaming: "border-[#00FF9D]/40 bg-[#00FF9D]/10 text-[#00FF9D]",
+  done: "border-emerald-400/30 bg-emerald-400/10 text-[#00FF9D]",
 };
 
 const STATUS_LABELS = {
@@ -287,132 +287,150 @@ export default function Sandbox() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
-      <h1 className="text-3xl font-bold tracking-tight text-white">Sandbox</h1>
-      <p className="mt-2 text-sm text-slate-400">
-        Prototype against any registered model before you commit.
-      </p>
+    <div className="relative min-h-screen bg-[#0B0F12]">
+      {/* Background ambient lighting */}
+      <div className="pointer-events-none absolute top-10 right-1/4 h-[350px] w-[500px] rounded-full bg-[#00FF9D]/[0.05] blur-[140px]" />
 
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-2">
-        <form
-          onSubmit={handleRun}
-          className="space-y-5 rounded-2xl border border-white/5 bg-slate-900/60 p-6"
-        >
-          <div>
-            <label
-              htmlFor="sandbox-model"
-              className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-            >
-              Model
-            </label>
-            <select
-              id="sandbox-model"
-              value={modelId}
-              onChange={(event) => setModelId(event.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-sm text-slate-200 outline-none transition focus:border-cyan-400/50"
-            >
-              {MODELS.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name} — {m.provider} ({m.latencyMs} ms)
-                </option>
-              ))}
-            </select>
-          </div>
+      <div className="relative mx-auto max-w-7xl px-6 py-12">
+        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-[10px] font-semibold tracking-widest text-[#00FF9D] uppercase">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#00FF9D] animate-pulse" />
+          INTERACTIVE TEST RUNTIME
+        </div>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          Inference <span className="text-[#00FF9D]">Sandbox</span>
+        </h1>
+        <p className="mt-1.5 text-xs text-slate-400 sm:text-sm">
+          Prototype and benchmark request streaming against any registered model with simulated hardware latency.
+        </p>
 
-          <div>
-            <label
-              htmlFor="sandbox-prompt"
-              className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-            >
-              Test prompt
-            </label>
-            <textarea
-              id="sandbox-prompt"
-              rows={8}
-              value={prompt}
-              onChange={(event) => setPrompt(event.target.value)}
-              placeholder="Summarize this contract and flag any auto-renewal clauses..."
-              className="w-full resize-y rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 font-mono text-sm text-slate-200 placeholder:text-slate-500 outline-none transition focus:border-cyan-400/50"
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-slate-500">
-              Est. cost:{" "}
-              <span className="font-semibold text-emerald-300">
-                {formatUSD(estimatedCost)}
-              </span>{" "}
-              {isRequestPriced(model)
-                ? "(billed per request)"
-                : `(~${inputTokens} in / ${outputTokens} out)`}
-            </p>
-            <button
-              type="submit"
-              className={`rounded-xl px-6 py-2.5 text-sm font-semibold transition disabled:opacity-40 ${
-                isRunning
-                  ? "border border-red-400/40 text-red-300 hover:bg-red-400/10"
-                  : "bg-linear-to-r from-neon-blue to-neon-emerald text-slate-950 hover:brightness-110"
-              }`}
-              disabled={!isRunning && !prompt.trim()}
-            >
-              {isRunning ? "Stop" : "Run Inference"}
-            </button>
-          </div>
-        </form>
-
-        <section className="rounded-2xl border border-white/5 bg-slate-900/60 p-6">
-          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-4">
-            <h2 className="text-sm font-semibold text-white">API Response</h2>
-            <div className="flex items-center gap-2">
-              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-400">
-                POST /v1/invoke
-              </span>
-              <span
-                className={`rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[run.status]}`}
-              >
-                {STATUS_LABELS[run.status]}
-              </span>
-            </div>
-          </header>
-
-          <div
-            aria-live="polite"
-            className="mt-5 min-h-[220px] rounded-xl border border-white/5 bg-slate-950/80 p-4"
+        <div className="mt-8 grid items-start gap-8 lg:grid-cols-2">
+          <form
+            onSubmit={handleRun}
+            className="space-y-5 rounded-2xl border border-white/[0.08] bg-[#12181F]/90 p-6 sm:p-8 shadow-xl backdrop-blur-md"
           >
-            {run.output ? (
-              <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-emerald-300/90">
-                {run.output}
-                {isRunning && (
-                  <span className="animate-pulse text-cyan-300">▍</span>
-                )}
-              </pre>
-            ) : (
-              <p className="pt-16 text-center text-sm text-slate-500">
-                {run.status === "connecting"
-                  ? "Establishing connection to inference endpoint..."
-                  : "Run an inference to see the mock JSON response here."}
+            <div>
+              <label
+                htmlFor="sandbox-model"
+                className="mb-2 block font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400"
+              >
+                Target Foundation Model
+              </label>
+              <select
+                id="sandbox-model"
+                value={modelId}
+                onChange={(event) => setModelId(event.target.value)}
+                className="w-full rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-2.5 font-mono text-xs text-slate-100 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+              >
+                {MODELS.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} — {m.provider} ({m.latencyMs} ms)
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="sandbox-prompt"
+                className="mb-2 block font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400"
+              >
+                Workload Prompt Input
+              </label>
+              <textarea
+                id="sandbox-prompt"
+                rows={8}
+                value={prompt}
+                onChange={(event) => setPrompt(event.target.value)}
+                placeholder="Summarize this technical specification and flag any auto-renewal clauses..."
+                className="w-full resize-y rounded-xl border border-white/[0.1] bg-[#0B0F12] px-4 py-3 font-mono text-xs text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-[#00FF9D]/50 focus:shadow-[0_0_20px_-4px_rgba(0,255,157,0.3)]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-white/[0.07] pt-4">
+              <p className="font-mono text-xs text-slate-400">
+                EST. COST:{" "}
+                <span className="font-bold text-[#00FF9D]">
+                  {formatUSD(estimatedCost)}
+                </span>{" "}
+                <span className="text-[10px] text-slate-500">
+                  {isRequestPriced(model)
+                    ? "(per request)"
+                    : `(~${inputTokens} in / ${outputTokens} out)`}
+                </span>
               </p>
-            )}
-          </div>
+              <button
+                type="submit"
+                className={`rounded-full px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-md disabled:opacity-40 ${
+                  isRunning
+                    ? "border border-rose-500/50 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20"
+                    : "bg-[#00FF9D] text-[#0B0F12] shadow-[0_0_20px_rgba(0,255,157,0.35)] hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] active:scale-95"
+                }`}
+                disabled={!isRunning && !prompt.trim()}
+              >
+                {isRunning ? "Stop Stream" : "Run Inference"}
+              </button>
+            </div>
+          </form>
 
-          <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/5 bg-white/5 sm:grid-cols-4">
-            {metrics.map(({ label, value }) => (
-              <div key={label} className="flex flex-col bg-slate-950/80 px-3 py-4">
-                <dd className="text-sm font-bold text-white">{value}</dd>
-                <dt className="mt-1 text-[10px] uppercase tracking-wider text-slate-500">
-                  {label}
-                </dt>
+          <section className="rounded-2xl border border-white/[0.08] bg-[#12181F]/90 p-6 sm:p-8 shadow-xl backdrop-blur-md">
+            <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] pb-4">
+              <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-white">Stream Output</h2>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full border border-white/[0.08] bg-[#0B0F12] px-3 py-1 font-mono text-[10px] text-slate-400">
+                  POST /v1/invoke
+                </span>
+                <span
+                  className={`rounded-full border px-3 py-1 font-mono text-[10px] font-bold ${STATUS_STYLES[run.status]}`}
+                >
+                  {STATUS_LABELS[run.status]}
+                </span>
               </div>
-            ))}
-          </dl>
+            </header>
 
-          <p className="mt-4 text-right text-xs text-slate-500">
-            Simulated cost:{" "}
-            <span className="font-semibold text-emerald-300">
-              {formatUSD(estimatedCost)}
-            </span>
-          </p>
-        </section>
+            <div
+              aria-live="polite"
+              className="mt-5 min-h-[240px] rounded-xl border border-white/[0.06] bg-[#070A0D] p-5 shadow-inner"
+            >
+              {run.output ? (
+                <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-[#00FF9D]">
+                  {run.output}
+                  {isRunning && (
+                    <span className="animate-pulse text-white">▍</span>
+                  )}
+                </pre>
+              ) : (
+                <div className="flex flex-col items-center justify-center pt-20 text-center text-xs font-mono text-slate-500">
+                  {run.status === "connecting" ? (
+                    <div className="flex items-center gap-2 text-amber-300">
+                      <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+                      ESTABLISHING HIGH-SPEED ENCLAVE ROUTE...
+                    </div>
+                  ) : (
+                    "ENTER A PROMPT AND CLICK 'RUN INFERENCE' TO STREAM RESPONSE DATA"
+                  )}
+                </div>
+              )}
+            </div>
+
+            <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.06] sm:grid-cols-4">
+              {metrics.map(({ label, value }) => (
+                <div key={label} className="flex flex-col bg-[#0B0F12] px-4 py-3">
+                  <dd className="font-mono text-sm font-bold text-white">{value}</dd>
+                  <dt className="mt-1 font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                    {label}
+                  </dt>
+                </div>
+              ))}
+            </dl>
+
+            <p className="mt-4 text-right font-mono text-[11px] text-slate-400">
+              SIMULATED COST:{" "}
+              <span className="font-bold text-[#00FF9D]">
+                {formatUSD(estimatedCost)}
+              </span>
+            </p>
+          </section>
+        </div>
       </div>
     </div>
   );

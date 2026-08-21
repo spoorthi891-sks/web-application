@@ -13,12 +13,12 @@ function NotFound({ id }) {
     <div className="mx-auto max-w-3xl px-6 py-32 text-center">
       <h1 className="text-2xl font-bold text-white">Model not found</h1>
       <p className="mt-2 text-sm text-slate-400">
-        The model <code className="text-cyan-300">{id}</code> is not in the
+        The model <code className="font-mono text-[#00FF9D]">{id}</code> is not in the
         registry or on the Hugging Face Hub.
       </p>
       <Link
         to="/explore"
-        className="mt-8 inline-block rounded-xl bg-linear-to-r from-neon-blue to-neon-emerald px-6 py-3 text-sm font-semibold text-slate-950 transition hover:brightness-110"
+        className="mt-8 inline-block rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition hover:bg-[#10B981]"
       >
         Back to marketplace
       </Link>
@@ -28,83 +28,91 @@ function NotFound({ id }) {
 
 function RegistryView({ model }) {
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
-      <Link
-        to="/explore"
-        className="text-sm text-slate-400 transition-colors hover:text-cyan-300"
-      >
-        ← Back to marketplace
-      </Link>
+    <div className="relative min-h-screen bg-[#080C0E]">
+      <div className="pointer-events-none absolute top-0 right-1/3 h-[400px] w-[600px] rounded-full bg-[#00FF9D]/[0.05] blur-[140px]" />
 
-      <header className="mt-6 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-xs font-medium text-cyan-300">
-            {model.category}
-          </span>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight text-white">
-            {model.name}
-          </h1>
-          <p className="mt-1 text-xs uppercase tracking-wider text-slate-500">
-            by {model.provider}
-          </p>
-          <p className="mt-4 max-w-2xl leading-relaxed text-slate-400">
-            {model.description}
-          </p>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {model.tags.map((tag) => (
-              <li
-                key={tag}
-                className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-400"
-              >
-                {tag}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="relative mx-auto max-w-7xl px-6 py-12">
+        <Link
+          to="/explore"
+          className="group inline-flex items-center gap-1 font-mono text-xs font-semibold text-slate-400 transition-colors hover:text-[#00FF9D]"
+        >
+          <span className="transition-transform group-hover:-translate-x-1">←</span> BACK TO MARKETPLACE
+        </Link>
 
-        <div className="flex shrink-0 gap-3">
-          <button
-            type="button"
-            onClick={() => document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" })}
-            className="rounded-xl bg-linear-to-r from-neon-blue to-neon-emerald px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:brightness-110"
-          >
-            Deploy to production
-          </button>
-          <Link
-            to="/sandbox"
-            className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-300"
-          >
-            Open in Sandbox
-          </Link>
-        </div>
-      </header>
-
-      <dl className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-        {[
-          { label: "Latency (median)", value: `${model.latencyMs} ms` },
-          { label: "Benchmark score", value: model.benchmarkScore.toFixed(1) },
-          { label: "Pricing", value: priceLabel(model) },
-          { label: "Privacy", value: model.privacyRating },
-          { label: "Provider", value: model.provider },
-          { label: "Category", value: model.category },
-        ].map(({ label, value }) => (
-          <div
-            key={label}
-            className="rounded-xl border border-white/5 bg-slate-900/60 p-4"
-          >
-            <dt className="text-xs uppercase tracking-wider text-slate-500">
-              {label}
-            </dt>
-            <dd className="mt-1.5 text-sm font-semibold text-white">{value}</dd>
+        <header className="mt-6 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-[11px] font-semibold text-[#00FF9D]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#00FF9D]" />
+              {model.category}
+            </span>
+            <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              {model.name}
+            </h1>
+            <p className="mt-1 font-mono text-xs uppercase tracking-wider text-slate-500">
+              by <span className="text-slate-300 font-semibold">{model.provider}</span> · VERIFIED PRODUCTION ENDPOINT
+            </p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300">
+              {model.description}
+            </p>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {model.tags.map((tag) => (
+                <li
+                  key={tag}
+                  className="rounded-full border border-white/[0.08] bg-[#0E141B] px-3 py-1 font-mono text-[11px] text-slate-400"
+                >
+                  {tag}
+                </li>
+              ))}
+            </ul>
           </div>
-        ))}
-      </dl>
 
-      <div id="plans" />
-      <PricingSection model={model} />
+          <div className="flex shrink-0 flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" })}
+              className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95 cursor-pointer"
+            >
+              Deploy to production
+            </button>
+            <Link
+              to="/sandbox"
+              className="rounded-full border border-white/[0.1] bg-[#0E141B]/90 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition-all hover:border-[#00FF9D]/40 hover:text-[#00FF9D] hover:bg-[#131B24]"
+            >
+              Open in Sandbox
+            </Link>
+          </div>
+        </header>
 
-      <div className="mt-10">
-        <CodeGenerator model={model} />
+        {/* Spec badges grid */}
+        <dl className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
+          {[
+            { label: "Latency (median)", value: `${model.latencyMs} ms` },
+            { label: "Benchmark score", value: model.benchmarkScore.toFixed(1), accent: true },
+            { label: "Pricing", value: priceLabel(model) },
+            { label: "Privacy posture", value: model.privacyRating },
+            { label: "Provider", value: model.provider },
+            { label: "Category", value: model.category },
+          ].map(({ label, value, accent }) => (
+            <div
+              key={label}
+              className="rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-4 backdrop-blur-md shadow-md transition-colors hover:bg-[#131B24]"
+            >
+              <dt className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                {label}
+              </dt>
+              <dd className={`mt-1.5 font-mono text-sm font-bold ${accent ? "text-[#00FF9D]" : "text-white"}`}>
+                {value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+
+        <div id="plans" />
+        <PricingSection model={model} />
+
+        <div className="mt-10">
+          <CodeGenerator model={model} />
+        </div>
       </div>
     </div>
   );
@@ -155,7 +163,7 @@ export default function ModelDetails() {
         <p className="mt-2 text-sm text-slate-500">{hfState.error}</p>
         <Link
           to="/explore"
-          className="mt-8 inline-block rounded-xl border border-white/10 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-300"
+          className="mt-8 inline-block rounded-full border border-white/10 bg-[#0E141B] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
         >
           Back to marketplace
         </Link>

@@ -24,31 +24,35 @@ export default function PricingSection({ model }) {
   }
 
   return (
-    <section className="mt-10 rounded-2xl border border-white/5 bg-slate-900/60 p-6">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+    <section className="mt-10 rounded-2xl border border-white/[0.08] bg-[#12181F]/90 p-6 sm:p-8 shadow-xl backdrop-blur-md">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/[0.07] pb-6">
         <div>
-          <h2 className="text-lg font-semibold text-white">Plans &amp; pricing</h2>
-          <p className="mt-1 text-sm text-slate-400">
-            Project your monthly bill and pick a plan — list price is{" "}
-            {priceLabel(model)}.
+          <div className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-[#00FF9D] uppercase tracking-wider">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#00FF9D]" />
+            DEPLOYMENT CAPACITY &amp; PRICING
+          </div>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight text-white">Tiered Infrastructure Plans</h2>
+          <p className="mt-1 text-xs text-slate-400">
+            Project workload costs dynamically — base endpoint list price is{" "}
+            <span className="font-mono font-semibold text-white">{priceLabel(model)}</span>.
           </p>
         </div>
         <button
           type="button"
           onClick={goToCheckout}
-          className="shrink-0 rounded-xl bg-linear-to-r from-neon-blue to-neon-emerald px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:brightness-110"
+          className="shrink-0 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#0B0F12] shadow-[0_0_20px_rgba(0,255,157,0.35)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] active:scale-95"
         >
           Continue to checkout →
         </button>
       </div>
 
-      <div className="mt-6 grid gap-6 sm:grid-cols-2">
+      <div className="mt-6 grid gap-6 sm:grid-cols-2 rounded-xl border border-white/[0.06] bg-[#0B0F12]/60 p-5">
         <div>
-          <div className="mb-2 flex items-center justify-between text-xs">
-            <span className="font-semibold uppercase tracking-wider text-slate-500">
+          <div className="mb-2 flex items-center justify-between font-mono text-xs">
+            <span className="font-semibold uppercase tracking-wider text-slate-400">
               Monthly requests
             </span>
-            <span className="font-semibold text-cyan-300">
+            <span className="font-bold text-[#00FF9D]">
               {formatTokenCount(monthlyRequests)}
             </span>
           </div>
@@ -60,15 +64,15 @@ export default function PricingSection({ model }) {
             value={monthlyRequests}
             onChange={(event) => setMonthlyRequests(parseInt(event.target.value, 10))}
             aria-label="Monthly requests"
-            className="w-full accent-cyan-400"
+            className="w-full accent-[#00FF9D] cursor-pointer"
           />
         </div>
         <div>
-          <div className="mb-2 flex items-center justify-between text-xs">
-            <span className="font-semibold uppercase tracking-wider text-slate-500">
-              Avg tokens per request
+          <div className="mb-2 flex items-center justify-between font-mono text-xs">
+            <span className="font-semibold uppercase tracking-wider text-slate-400">
+              Avg tokens / request
             </span>
-            <span className="font-semibold text-cyan-300">
+            <span className="font-bold text-[#00FF9D]">
               {avgTokens.toLocaleString()}
             </span>
           </div>
@@ -80,12 +84,12 @@ export default function PricingSection({ model }) {
             value={avgTokens}
             onChange={(event) => setAvgTokens(parseInt(event.target.value, 10))}
             aria-label="Average tokens per request"
-            className="w-full accent-cyan-400"
+            className="w-full accent-[#00FF9D] cursor-pointer"
           />
         </div>
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
+      <div className="mt-8 grid gap-5 md:grid-cols-3">
         {PLANS.map((plan) => {
           const cost = calculatePlanCost(plan, model, traffic);
           const selected = plan.id === selectedPlanId;
@@ -95,37 +99,42 @@ export default function PricingSection({ model }) {
               type="button"
               onClick={() => setSelectedPlanId(plan.id)}
               aria-pressed={selected}
-              className={`relative flex flex-col rounded-xl border p-5 text-left transition ${
+              className={`relative flex flex-col justify-between rounded-2xl border p-6 text-left transition-all duration-300 ${
                 selected
-                  ? "border-cyan-400/60 bg-cyan-400/5 shadow-[0_0_28px_-10px_rgba(34,211,238,0.45)]"
-                  : "border-white/10 bg-slate-950/40 hover:border-white/25"
+                  ? "border-[#00FF9D] bg-[#00FF9D]/[0.04] shadow-[0_0_32px_-8px_rgba(0,255,157,0.3)] ring-1 ring-[#00FF9D]/40"
+                  : "border-white/[0.08] bg-[#0B0F12]/80 hover:border-white/20 hover:bg-[#12181F]"
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-2.5 right-4 rounded-full border border-emerald-400/30 bg-slate-950 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
-                  Popular
+                <span className="absolute -top-3 right-5 rounded-full border border-emerald-500/40 bg-[#0B0F12] px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#00FF9D] shadow-md">
+                  POPULAR CHOICE
                 </span>
               )}
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-white">{plan.name}</h3>
-                <span
-                  className={`h-4 w-4 rounded-full border transition ${
-                    selected
-                      ? "border-cyan-400 bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.7)]"
-                      : "border-white/25"
-                  }`}
-                />
+              <div>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-mono text-sm font-bold uppercase tracking-wide text-white">{plan.name}</h3>
+                  <span
+                    className={`h-4 w-4 rounded-full border transition-all ${
+                      selected
+                        ? "border-[#00FF9D] bg-[#00FF9D] shadow-[0_0_8px_#00FF9D]"
+                        : "border-white/30"
+                    }`}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-slate-400">{plan.tagline}</p>
+                <div className="mt-5">
+                  <span className="font-mono text-3xl font-extrabold text-white">
+                    {formatUSD(cost.total)}
+                  </span>
+                  <span className="font-mono text-xs text-slate-500"> / month</span>
+                </div>
               </div>
-              <p className="mt-0.5 text-xs text-slate-500">{plan.tagline}</p>
-              <p className="mt-4 text-2xl font-bold text-white">
-                {formatUSD(cost.total)}
-                <span className="text-xs font-medium text-slate-500"> / mo</span>
-              </p>
-              <ul className="mt-4 space-y-1.5 border-t border-white/5 pt-4 text-xs text-slate-400">
+
+              <ul className="mt-6 space-y-2 border-t border-white/[0.07] pt-5 text-xs text-slate-300">
                 {plan.perks.map((perk) => (
-                  <li key={perk} className="flex items-center gap-2">
-                    <span className="text-emerald-400">✓</span>
-                    {perk}
+                  <li key={perk} className="flex items-start gap-2.5">
+                    <span className="font-bold text-[#00FF9D]">✓</span>
+                    <span>{perk}</span>
                   </li>
                 ))}
               </ul>
