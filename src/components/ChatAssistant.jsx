@@ -122,6 +122,7 @@ export default function ChatAssistant() {
     if (!text || busy) return;
 
     setInput("");
+    setMessages((current) => [...current, { role: "user", text }]);
     setBusy(true);
 
     const history = messages
