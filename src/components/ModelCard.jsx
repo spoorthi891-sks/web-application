@@ -26,7 +26,7 @@ export default function ModelCard({ model }) {
   return (
     <Link
       to={`/models/${encodeURIComponent(model.id)}`}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#00FF9D]/40 hover:bg-[#131B24] hover:shadow-[0_12px_36px_-8px_rgba(0,255,157,0.18)]"
+      className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#00FF9D]/40 hover:bg-[#131B24] hover:shadow-[0_12px_36px_-8px_rgba(0,255,157,0.18)] active:scale-[0.99]"
     >
       {/* Top subtle highlight gradient */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00FF9D]/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

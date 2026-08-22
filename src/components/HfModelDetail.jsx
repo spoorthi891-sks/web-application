@@ -117,13 +117,13 @@ export default function HfModelDetail({ model }) {
               href={model.externalUrl}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full border border-white/[0.1] bg-[#0E141B]/90 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition-all hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
+              className="rounded-full border border-white/[0.1] bg-[#0E141B]/90 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition-all hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98]"
             >
               View on Hugging Face ↗
             </a>
             <Link
               to={`/sandbox?model=${encodeURIComponent(model.id)}`}
-              className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95 cursor-pointer"
+              className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-[0.98] cursor-pointer"
             >
               Open in Sandbox
             </Link>
@@ -132,10 +132,11 @@ export default function HfModelDetail({ model }) {
 
         {/* Specs grid */}
         <dl className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
-          {specs.map(({ label, value, accent }) => (
+          {specs.map(({ label, value, accent }, index) => (
             <div
               key={label}
-              className="rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-4 backdrop-blur-md shadow-md transition-colors hover:bg-[#131B24]"
+              style={{ "--stagger": index }}
+              className="stagger-item rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-4 backdrop-blur-md shadow-md transition-colors hover:bg-[#131B24]"
             >
               <dt className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
                 {label}

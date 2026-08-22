@@ -68,7 +68,7 @@ export default function Navbar() {
           {session ? (
             <Link
               to="/account"
-              className="rounded-full bg-[#00FF9D] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] active:scale-95"
+              className="rounded-full bg-[#00FF9D] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] active:scale-[0.98]"
             >
               My Keys
             </Link>
@@ -76,7 +76,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setAuthOpen(true)}
-              className="rounded-full bg-[#00FF9D] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] active:scale-95 cursor-pointer"
+              className="rounded-full bg-[#00FF9D] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.55)] active:scale-[0.98] cursor-pointer"
             >
               Get API Key
             </button>
@@ -88,7 +88,7 @@ export default function Navbar() {
             aria-expanded={menuOpen}
             aria-controls="mobile-nav-menu"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
-            className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 cursor-pointer md:hidden ${
+            className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 active:scale-90 cursor-pointer md:hidden ${
               menuOpen
                 ? "border-[#00FF9D]/50 bg-[#00FF9D]/10 text-[#00FF9D]"
                 : "border-white/[0.1] bg-[#0E141B]/90 text-slate-300 hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
@@ -109,7 +109,7 @@ export default function Navbar() {
       {menuOpen && (
         <div
           id="mobile-nav-menu"
-          className="border-t border-white/[0.06] bg-[#080C0E]/95 backdrop-blur-xl md:hidden"
+          className="border-t border-white/[0.06] bg-[#080C0E]/95 backdrop-blur-xl md:hidden animate-slide-down"
         >
           <ul className="mx-auto max-w-7xl space-y-1 px-6 py-4">
             {LINKS.map(({ to, label, end }) => (

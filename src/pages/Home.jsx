@@ -114,13 +114,13 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative mx-auto max-w-7xl px-6 pt-24 pb-16 text-center">
         {/* Pill Badge */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold tracking-wider text-[#00FF9D] shadow-[0_0_15px_rgba(0,255,157,0.15)] transition-transform hover:scale-105">
+        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold tracking-wider text-[#00FF9D] shadow-[0_0_15px_rgba(0,255,157,0.15)] transition-transform hover:scale-105 animate-fade-rise">
           <span className="h-2 w-2 rounded-full bg-[#00FF9D] shadow-[0_0_8px_#00FF9D] animate-pulse" />
           ENTERPRISE AI MARKETPLACE
         </div>
 
         {/* Hero Title */}
-        <h1 className="mx-auto mt-8 max-w-4xl text-4xl font-extrabold tracking-tight text-white sm:text-6xl sm:leading-[1.15]">
+        <h1 className="mx-auto mt-8 max-w-4xl text-4xl font-extrabold tracking-tight text-white sm:text-6xl sm:leading-[1.15] animate-fade-rise">
           Deploy and <span className="text-[#00FF9D]">scale</span>{" "}
           <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00FF9D] via-emerald-300 to-teal-200">
             foundation models
@@ -128,7 +128,7 @@ export default function Home() {
           with enterprise speed
         </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-lg">
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-lg animate-fade-rise">
           Describe your engineering workload. Highrise benchmarks vetted foundation
           models — compare latency, compliance, and transparent token pricing in one unified control plane.
         </p>
@@ -136,7 +136,7 @@ export default function Home() {
         {/* High-tech Search Bar */}
         <form
           onSubmit={handleSearch}
-          className="group mx-auto mt-10 flex max-w-2xl items-center gap-2 rounded-full border border-white/[0.1] bg-[#0E141B]/90 p-2 shadow-[0_0_40px_-10px_rgba(0,255,157,0.12)] backdrop-blur-xl transition-all duration-300 focus-within:border-[#00FF9D]/50 focus-within:shadow-[0_0_50px_-10px_rgba(0,255,157,0.25)]"
+          className="group mx-auto mt-10 flex max-w-2xl items-center gap-2 rounded-full border border-white/[0.1] bg-[#0E141B]/90 p-2 shadow-[0_0_40px_-10px_rgba(0,255,157,0.12)] backdrop-blur-xl transition-all duration-300 focus-within:border-[#00FF9D]/50 focus-within:shadow-[0_0_50px_-10px_rgba(0,255,157,0.25)] animate-fade-rise"
         >
           <div className="pl-3 text-slate-500">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,20 +153,20 @@ export default function Home() {
           />
           <button
             type="submit"
-            className="shrink-0 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95"
+            className="shrink-0 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-[0.98] cursor-pointer"
           >
             Find models
           </button>
         </form>
 
         {/* Quick Filter Tags */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs animate-fade-rise">
           <span className="font-mono text-[11px] uppercase tracking-wider text-slate-500">POPULAR:</span>
           {QUICK_TAGS.map((tag) => (
             <Link
               key={tag}
               to={`/explore?q=${encodeURIComponent(tag)}`}
-              className="rounded-full border border-white/[0.08] bg-[#0E141B]/70 px-3.5 py-1 text-slate-400 transition-all duration-200 hover:border-[#00FF9D]/40 hover:bg-[#131B24] hover:text-[#00FF9D]"
+              className="rounded-full border border-white/[0.08] bg-[#0E141B]/70 px-3.5 py-1 text-slate-400 transition-all duration-200 hover:border-[#00FF9D]/40 hover:bg-[#131B24] hover:text-[#00FF9D] active:scale-[0.98]"
             >
               {tag}
             </Link>
@@ -175,8 +175,8 @@ export default function Home() {
 
         {/* Stats Grid */}
         <dl className="mx-auto mt-20 grid max-w-4xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.05] shadow-2xl sm:grid-cols-4">
-          {stats.map(({ value, label }) => (
-            <div key={label} className="flex flex-col bg-[#0E141B]/95 px-6 py-6 text-left transition-colors hover:bg-[#131B24]">
+          {stats.map(({ value, label }, index) => (
+            <div key={label} style={{ "--stagger": index }} className="stagger-item flex flex-col bg-[#0E141B]/95 px-6 py-6 text-left transition-colors hover:bg-[#131B24]">
               <dd className="font-mono text-3xl font-bold tracking-tight text-white">{value}</dd>
               <dt className="mt-1 font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 {label}
@@ -211,7 +211,7 @@ export default function Home() {
                   key={node.id}
                   type="button"
                   onClick={() => setActiveNode(index)}
-                  className={`group relative flex items-center justify-between rounded-xl border p-4 text-left transition-all duration-300 ${
+                  className={`group relative flex items-center justify-between rounded-xl border p-4 text-left transition-all duration-300 active:scale-[0.99] cursor-pointer ${
                     active
                       ? "border-[#00FF9D]/60 bg-[#00FF9D]/[0.06] shadow-[0_0_24px_-6px_rgba(0,255,157,0.25)] ring-1 ring-[#00FF9D]/30"
                       : "border-white/[0.07] bg-[#080C0E]/70 hover:border-white/20 hover:bg-[#131B24]"
@@ -256,7 +256,7 @@ export default function Home() {
                 <div className="mt-6 flex items-center gap-3">
                   <Link
                     to="/explore"
-                    className="inline-flex items-center gap-2 rounded-full bg-[#00FF9D] px-5 py-2 text-xs font-bold text-[#080C0E] shadow-[0_0_15px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981]"
+                    className="inline-flex items-center gap-2 rounded-full bg-[#00FF9D] px-5 py-2 text-xs font-bold text-[#080C0E] shadow-[0_0_15px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] active:scale-[0.98]"
                   >
                     Deploy models on this stack →
                   </Link>
@@ -324,8 +324,10 @@ export default function Home() {
 
         {status === "ready" && (
           <div className="grid gap-6 md:grid-cols-3">
-            {trending.map((model) => (
-              <ModelCard key={model.id} model={model} />
+            {trending.map((model, index) => (
+              <div key={model.id} style={{ "--stagger": index }} className="stagger-item">
+                <ModelCard model={model} />
+              </div>
             ))}
           </div>
         )}
@@ -343,7 +345,7 @@ export default function Home() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {VALUE_PROPS.map(({ step, title, body, icon }) => {
+          {VALUE_PROPS.map(({ step, title, body, icon }, index) => {
             const cta =
               step === "01"
                 ? { to: "/matchmaker", label: "TRY THE MATCHMAKER" }
@@ -355,7 +357,8 @@ export default function Home() {
               <ArticleTag
                 key={step}
                 {...(cta ? { to: cta.to } : {})}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E141B]/90 p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#00FF9D]/40 hover:bg-[#131B24] hover:shadow-[0_12px_36px_-8px_rgba(0,255,157,0.15)]"
+                style={{ "--stagger": index }}
+                className="stagger-item group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0E141B]/90 p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#00FF9D]/40 hover:bg-[#131B24] hover:shadow-[0_12px_36px_-8px_rgba(0,255,157,0.15)] active:scale-[0.99]"
               >
               <div>
                 <div className="flex items-center justify-between">

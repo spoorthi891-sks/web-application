@@ -252,7 +252,7 @@ export default function Matchmaker() {
                         key={preset}
                         type="button"
                         onClick={() => setQuery(preset)}
-                        className="rounded-full border border-white/[0.08] bg-[#080C0E]/70 px-3 py-1.5 text-left text-[11px] text-slate-400 transition-all duration-200 hover:border-[#00FF9D]/40 hover:text-[#00FF9D] cursor-pointer"
+                        className="rounded-full border border-white/[0.08] bg-[#080C0E]/70 px-3 py-1.5 text-left text-[11px] text-slate-400 transition-all duration-200 hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98] cursor-pointer"
                       >
                         {preset}
                       </button>
@@ -271,7 +271,7 @@ export default function Matchmaker() {
                           type="button"
                           onClick={() => setCategory(option)}
                           aria-pressed={active}
-                          className={`rounded-full border px-3 py-1 font-mono text-[11px] font-semibold transition-all duration-200 cursor-pointer ${
+                          className={`rounded-full border px-3 py-1 font-mono text-[11px] font-semibold transition-all duration-200 active:scale-[0.98] cursor-pointer ${
                             active
                               ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)]"
                               : "border-white/[0.08] bg-[#080C0E]/70 text-slate-400 hover:border-white/20 hover:text-white"
@@ -336,7 +336,7 @@ export default function Matchmaker() {
                         role="radio"
                         aria-checked={active}
                         onClick={() => setPriority(option.id)}
-                        className={`flex w-full items-start justify-between gap-3 rounded-xl border p-4 text-left transition-all duration-300 cursor-pointer sm:p-5 ${
+                        className={`flex w-full items-start justify-between gap-3 rounded-xl border p-4 text-left transition-all duration-300 active:scale-[0.99] cursor-pointer sm:p-5 ${
                           active
                             ? "border-[#00FF9D]/60 bg-[#00FF9D]/[0.06] shadow-[0_0_24px_-6px_rgba(0,255,157,0.25)] ring-1 ring-[#00FF9D]/30"
                             : "border-white/[0.07] bg-[#080C0E]/70 hover:border-white/20 hover:bg-[#131B24]"
@@ -376,7 +376,7 @@ export default function Matchmaker() {
                 <button
                   type="button"
                   onClick={() => setStep(step - 1)}
-                  className="rounded-full border border-white/10 bg-[#080C0E] px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-slate-300 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] cursor-pointer"
+                  className="rounded-full border border-white/10 bg-[#080C0E] px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-slate-300 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98] cursor-pointer"
                 >
                   ← Back
                 </button>
@@ -388,7 +388,7 @@ export default function Matchmaker() {
                   type="button"
                   onClick={() => setStep(step + 1)}
                   disabled={step === 0 && !workloadReady}
-                  className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none cursor-pointer"
+                  className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none cursor-pointer"
                 >
                   Continue →
                 </button>
@@ -396,7 +396,7 @@ export default function Matchmaker() {
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-[0.98] cursor-pointer"
                 >
                   <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -431,7 +431,7 @@ export default function Matchmaker() {
               <button
                 type="button"
                 onClick={resetWizard}
-                className="ml-auto rounded-full border border-white/10 bg-[#080C0E] px-4 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-300 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] cursor-pointer"
+                className="ml-auto rounded-full border border-white/10 bg-[#080C0E] px-4 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-300 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98] cursor-pointer"
               >
                 ↺ Start over
               </button>
@@ -458,7 +458,7 @@ export default function Matchmaker() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="mt-6 rounded-full bg-[#00FF9D] px-5 py-2 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_15px_rgba(0,255,157,0.3)] transition hover:bg-[#10B981] cursor-pointer"
+                  className="mt-6 rounded-full bg-[#00FF9D] px-5 py-2 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_15px_rgba(0,255,157,0.3)] transition hover:bg-[#10B981] active:scale-[0.98] cursor-pointer"
                 >
                   Adjust budget
                 </button>
@@ -468,12 +468,12 @@ export default function Matchmaker() {
                 {rankedTop3.map(({ model, score, relevant }, index) => (
                   <li
                     key={model.id}
-                    style={{ animationDelay: `${index * 90}ms` }}
+                    style={{ "--stagger": index, animationDelay: `${index * 50}ms` }}
                     className="fade-in-up"
                   >
                     <Link
                       to={`/models/${encodeURIComponent(model.id)}`}
-                      className={`group relative block overflow-hidden rounded-2xl border bg-[#0E141B]/95 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#131B24] sm:p-6 ${
+                      className={`group relative block overflow-hidden rounded-2xl border bg-[#0E141B]/95 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#131B24] active:scale-[0.99] sm:p-6 ${
                         index === 0
                           ? "border-[#00FF9D]/40 shadow-[0_8px_32px_-10px_rgba(0,255,157,0.35)]"
                           : "border-white/[0.08] hover:border-[#00FF9D]/40"
@@ -563,7 +563,7 @@ export default function Matchmaker() {
               <button
                 type="button"
                 onClick={resetWizard}
-                className="rounded-full border border-white/10 bg-[#0E141B] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] cursor-pointer"
+                className="rounded-full border border-white/10 bg-[#0E141B] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98] cursor-pointer"
               >
                 ← Refine preferences
               </button>

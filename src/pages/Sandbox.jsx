@@ -605,10 +605,10 @@ export default function Sandbox() {
               </p>
               <button
                 type="submit"
-                className={`rounded-full px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-md disabled:opacity-40 cursor-pointer ${
+                className={`rounded-full px-6 py-2.5 font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-[0.98] disabled:opacity-40 cursor-pointer ${
                   isRunning
                     ? "border border-rose-500/50 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20"
-                    : "bg-[#00FF9D] text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95"
+                    : "bg-[#00FF9D] text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)]"
                 }`}
                 disabled={!isRunning && !prompt.trim()}
               >
@@ -690,7 +690,7 @@ export default function Sandbox() {
               <button
                 type="button"
                 onClick={handleClearHistory}
-                className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 transition-colors hover:text-rose-300 cursor-pointer"
+                className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 transition-colors hover:text-rose-300 active:scale-95 cursor-pointer"
               >
                 Clear history
               </button>
@@ -706,10 +706,11 @@ export default function Sandbox() {
             </div>
           ) : (
             <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {history.map((entry) => (
+              {history.map((entry, index) => (
                 <li
                   key={entry.id}
-                  className="flex flex-col rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#00FF9D]/40"
+                  style={{ "--stagger": index }}
+                  className="stagger-item flex flex-col rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#00FF9D]/40"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex min-w-0 items-center gap-2">
@@ -751,7 +752,7 @@ export default function Sandbox() {
                     <button
                       type="button"
                       onClick={() => handleRestore(entry)}
-                      className="rounded-full border border-white/10 bg-[#080C0E] px-4 py-1.5 font-mono text-[11px] font-semibold text-slate-300 transition hover:border-[#00FF9D]/50 hover:text-[#00FF9D] cursor-pointer"
+                      className="rounded-full border border-white/10 bg-[#080C0E] px-4 py-1.5 font-mono text-[11px] font-semibold text-slate-300 transition hover:border-[#00FF9D]/50 hover:text-[#00FF9D] active:scale-95 cursor-pointer"
                     >
                       Restore →
                     </button>

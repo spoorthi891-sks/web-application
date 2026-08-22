@@ -373,10 +373,10 @@ export default function Compare() {
                       }
                       className={`rounded-full border px-3 py-1 font-mono text-[11px] font-semibold transition-all duration-200 ${
                         active
-                          ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)] cursor-pointer"
+                          ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)] active:scale-[0.98] cursor-pointer"
                           : capped
                             ? "border-white/[0.06] bg-[#080C0E]/70 text-slate-600 cursor-not-allowed"
-                            : "border-white/[0.08] bg-[#080C0E]/70 text-slate-400 hover:border-white/20 hover:text-white cursor-pointer"
+                            : "border-white/[0.08] bg-[#080C0E]/70 text-slate-400 hover:border-white/20 hover:text-white active:scale-[0.98] cursor-pointer"
                       }`}
                     >
                       {model.name}
@@ -394,7 +394,7 @@ export default function Compare() {
                     selectedIds.length === 0 ? DEFAULT_SELECTION : [],
                   )
                 }
-                className="mt-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 transition-colors hover:text-[#00FF9D] cursor-pointer"
+                className="mt-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 transition-colors hover:text-[#00FF9D] active:scale-95 cursor-pointer"
               >
                 {selectedIds.length === 0 ? "RESTORE DEFAULTS" : "CLEAR ALL"}
               </button>
@@ -432,10 +432,10 @@ export default function Compare() {
                   const delta = monthlyCost - cheapest;
                   const barWidth = maxCost > 0 ? Math.max(3, (monthlyCost / maxCost) * 100) : 3;
                   return (
-                    <li key={model.id}>
+                    <li key={model.id} style={{ "--stagger": index }} className="stagger-item">
                       <Link
                         to={`/models/${encodeURIComponent(model.id)}`}
-                        className={`group flex flex-col gap-4 rounded-2xl border bg-[#0E141B]/95 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#131B24] sm:flex-row sm:items-center ${
+                        className={`group flex flex-col gap-4 rounded-2xl border bg-[#0E141B]/95 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#131B24] active:scale-[0.99] sm:flex-row sm:items-center ${
                           isCheapest
                             ? "border-[#00FF9D]/40 shadow-[0_8px_28px_-10px_rgba(0,255,157,0.25)]"
                             : "border-white/[0.08] hover:border-[#00FF9D]/40"

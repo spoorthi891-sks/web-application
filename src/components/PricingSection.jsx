@@ -40,7 +40,7 @@ export default function PricingSection({ model }) {
         <button
           type="button"
           onClick={goToCheckout}
-          className="shrink-0 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-95 cursor-pointer"
+          className="shrink-0 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all duration-200 hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-[0.98] cursor-pointer"
         >
           Continue to checkout →
         </button>
@@ -99,7 +99,7 @@ export default function PricingSection({ model }) {
               type="button"
               onClick={() => setSelectedPlanId(plan.id)}
               aria-pressed={selected}
-              className={`relative flex flex-col justify-between rounded-2xl border p-6 text-left transition-all duration-300 ${
+              className={`relative flex flex-col justify-between rounded-2xl border p-6 text-left transition-all duration-300 active:scale-[0.99] cursor-pointer ${
                 selected
                   ? "border-[#00FF9D] bg-[#00FF9D]/[0.04] shadow-[0_0_32px_-8px_rgba(0,255,157,0.25)] ring-1 ring-[#00FF9D]/40"
                   : "border-white/[0.08] bg-[#080C0E]/80 hover:border-white/20 hover:bg-[#131B24]"

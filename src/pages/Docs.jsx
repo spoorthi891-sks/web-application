@@ -123,7 +123,7 @@ function CodeBlock({ title, code }) {
         <button
           type="button"
           onClick={handleCopy}
-          className={`font-mono text-[10px] font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+          className={`font-mono text-[10px] font-semibold uppercase tracking-wider transition-colors active:scale-90 cursor-pointer ${
             copied ? "text-[#00FF9D]" : "text-slate-500 hover:text-[#00FF9D]"
           }`}
         >
@@ -238,7 +238,7 @@ export default function Docs() {
                 <li key={id}>
                   <a
                     href={`#${id}`}
-                    className="block border-l-2 border-transparent py-1 pl-3 text-xs text-slate-400 transition-colors hover:border-[#00FF9D]/50 hover:text-white lg:text-[13px]"
+                    className="block border-l-2 border-transparent py-1 pl-3 text-xs text-slate-400 transition-all duration-200 hover:border-[#00FF9D]/50 hover:text-white lg:text-[13px]"
                   >
                     {label}
                   </a>

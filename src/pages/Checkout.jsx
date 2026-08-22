@@ -315,14 +315,14 @@ export default function Checkout() {
             <span className="font-semibold text-[#00FF9D]">{plan.name}</span> plan is provisioned.
           </p>
 
-          <div className="mt-8 flex items-center justify-between gap-3 rounded-2xl border border-[#00FF9D]/40 bg-[#00FF9D]/[0.05] p-5 shadow-[0_0_35px_-8px_rgba(0,255,157,0.25)]">
+          <div className="mt-8 flex items-center justify-between gap-3 rounded-2xl border border-[#00FF9D]/40 bg-[#00FF9D]/[0.05] p-5 shadow-[0_0_35px_-8px_rgba(0,255,157,0.25)] animate-fade-rise">
             <code className="truncate font-mono text-sm font-bold text-[#00FF9D]">
               {apiKey}
             </code>
             <button
               type="button"
               onClick={handleCopyKey}
-              className="shrink-0 rounded-full border border-white/20 bg-[#080C0E] px-4 py-2 font-mono text-xs font-semibold text-slate-200 transition hover:border-[#00FF9D] hover:text-[#00FF9D] cursor-pointer"
+              className="shrink-0 rounded-full border border-white/20 bg-[#080C0E] px-4 py-2 font-mono text-xs font-semibold text-slate-200 transition hover:border-[#00FF9D] hover:text-[#00FF9D] active:scale-95 cursor-pointer"
             >
               {copied ? "COPIED ✓" : "COPY KEY"}
             </button>
@@ -337,21 +337,21 @@ export default function Checkout() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to={`/sandbox?model=${encodeURIComponent(model.id)}`}
-              className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)]"
+              className="rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-[0.98]"
             >
               Run inference in Sandbox
             </Link>
             {session && (
               <Link
                 to="/account"
-                className="rounded-full border border-white/10 bg-[#0E141B] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
+                className="rounded-full border border-white/10 bg-[#0E141B] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98]"
               >
                 View workspace
               </Link>
             )}
             <Link
               to={`/models/${encodeURIComponent(model.id)}`}
-              className="rounded-full border border-white/10 bg-[#0E141B] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
+              className="rounded-full border border-white/10 bg-[#0E141B] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98]"
             >
               Back to model specs
             </Link>
@@ -565,7 +565,7 @@ export default function Checkout() {
             <button
               type="submit"
               disabled={!formValid}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#00FF9D] px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#00FF9D] px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] hover:shadow-[0_0_28px_rgba(0,255,157,0.5)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             >
               {`CONFIRM & PAY ${formatUSD(cost.total)} / MO`}
             </button>

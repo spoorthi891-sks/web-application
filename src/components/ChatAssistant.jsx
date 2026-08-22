@@ -78,7 +78,7 @@ function ModelCard({ model, best }) {
       <Link
         to={`/models/${encodeURIComponent(model.id)}`}
         onClick={() => window.dispatchEvent(new CustomEvent("close-chat-assistant"))}
-        className="shrink-0 rounded-lg border border-[#00FF9D]/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-[#00FF9D] transition hover:bg-[#00FF9D]/10"
+        className="shrink-0 rounded-lg border border-[#00FF9D]/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-[#00FF9D] transition-all hover:bg-[#00FF9D]/10 active:scale-95"
       >
         View
       </Link>
@@ -196,7 +196,7 @@ export default function ChatAssistant() {
           <button
             type="button"
             onClick={() => followUp("__compare__", message.intent, message.matches)}
-            className="rounded-full bg-[#00FF9D]/15 px-2.5 py-1 text-[11px] font-medium text-[#00FF9D] transition hover:bg-[#00FF9D]/25"
+            className="rounded-full bg-[#00FF9D]/15 px-2.5 py-1 text-[11px] font-medium text-[#00FF9D] transition-all hover:bg-[#00FF9D]/25 active:scale-[0.98] cursor-pointer"
           >
             Compare these picks →
           </button>
@@ -207,7 +207,7 @@ export default function ChatAssistant() {
               key={chip}
               type="button"
               onClick={() => followUp(chip, message.intent)}
-              className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-slate-400 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
+              className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-slate-400 transition-all hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98] cursor-pointer"
             >
               {chip}
             </button>
@@ -222,7 +222,7 @@ export default function ChatAssistant() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open Highrise model advisor"
-        className="fixed bottom-5 right-5 z-50 flex size-14 items-center justify-center rounded-full bg-[#00FF9D] text-[#080C0E] shadow-[0_8px_30px_rgba(0,255,157,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,255,157,0.5)]"
+        className="fixed bottom-5 right-5 z-50 flex size-14 items-center justify-center rounded-full bg-[#00FF9D] text-[#080C0E] shadow-[0_8px_30px_rgba(0,255,157,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,255,157,0.5)] active:scale-[0.95] cursor-pointer"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-6">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -232,7 +232,7 @@ export default function ChatAssistant() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex h-[min(74vh,560px)] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0E141B]/95 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur">
+    <div className="fixed bottom-5 right-5 z-50 flex h-[min(74vh,560px)] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0E141B]/95 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur animate-chat-panel">
       <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-slate-500">
@@ -247,7 +247,7 @@ export default function ChatAssistant() {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Close assistant"
-          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-white/5 hover:text-slate-200"
+          className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-200 active:scale-90 cursor-pointer"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-4">
             <path d="M18 6 6 18M6 6l12 12" />
@@ -292,7 +292,7 @@ export default function ChatAssistant() {
               key={reply}
               type="button"
               onClick={() => sendMessage(reply)}
-              className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-slate-400 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
+              className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-slate-400 transition-all hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98] cursor-pointer"
             >
               {reply}
             </button>
@@ -318,7 +318,7 @@ export default function ChatAssistant() {
           type="submit"
           disabled={busy || !input.trim()}
           aria-label="Send message"
-          className="shrink-0 rounded-xl bg-[#00FF9D] p-2 text-[#080C0E] transition disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:brightness-110"
+          className="shrink-0 rounded-xl bg-[#00FF9D] p-2 text-[#080C0E] transition-all disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:brightness-110 enabled:active:scale-95 cursor-pointer"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4">
             <path d="m22 2-7 20-4-9-9-4Z" />

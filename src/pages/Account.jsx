@@ -166,7 +166,7 @@ export default function Account() {
           <button
             type="button"
             onClick={() => setAuthOpen(true)}
-            className="mt-8 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] cursor-pointer"
+            className="mt-8 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] active:scale-[0.98] cursor-pointer"
           >
             Sign in to Highrise
           </button>
@@ -216,7 +216,7 @@ export default function Account() {
           <button
             type="button"
             onClick={signOut}
-            className="self-start rounded-full border border-white/10 bg-[#0E141B]/90 px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-slate-300 transition hover:border-rose-500/40 hover:text-rose-300 cursor-pointer sm:self-auto"
+            className="self-start rounded-full border border-white/10 bg-[#0E141B]/90 px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-slate-300 transition hover:border-rose-500/40 hover:text-rose-300 active:scale-95 cursor-pointer sm:self-auto"
           >
             Sign out
           </button>
@@ -227,8 +227,8 @@ export default function Account() {
             { value: String(apiKeys.length), label: "Active API keys" },
             { value: String(plansUsed.length), label: "Billing plans" },
             { value: "99.95%", label: "Workspace uptime" },
-          ].map(({ value, label }) => (
-            <div key={label} className="flex flex-col bg-[#0E141B]/95 px-6 py-6">
+          ].map(({ value, label }, index) => (
+            <div key={label} style={{ "--stagger": index }} className="stagger-item flex flex-col bg-[#0E141B]/95 px-6 py-6">
               <dd className="font-mono text-3xl font-bold text-white">{value}</dd>
               <dt className="mt-1 font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 {label}
@@ -336,7 +336,7 @@ export default function Account() {
             </h2>
             <Link
               to="/explore"
-              className="rounded-full bg-[#00FF9D] px-5 py-2 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_15px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981]"
+              className="rounded-full bg-[#00FF9D] px-5 py-2 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_15px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] active:scale-[0.98]"
             >
               + Deploy new model
             </Link>
@@ -352,17 +352,18 @@ export default function Account() {
               </p>
               <Link
                 to="/explore"
-                className="mt-6 inline-block rounded-full border border-white/10 bg-[#131B24] px-5 py-2 font-mono text-xs text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
+                className="mt-6 inline-block rounded-full border border-white/10 bg-[#131B24] px-5 py-2 font-mono text-xs text-slate-200 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D] active:scale-[0.98]"
               >
                 Browse the marketplace →
               </Link>
             </div>
           ) : (
             <ul className="space-y-4">
-              {apiKeys.map((entry) => (
+              {apiKeys.map((entry, index) => (
                 <li
                   key={entry.id}
-                  className="rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-5 shadow-lg backdrop-blur-md transition-colors hover:border-[#00FF9D]/30 sm:p-6"
+                  style={{ "--stagger": index }}
+                  className="stagger-item rounded-2xl border border-white/[0.08] bg-[#0E141B]/95 p-5 shadow-lg backdrop-blur-md transition-colors hover:border-[#00FF9D]/30 sm:p-6"
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0">
@@ -394,14 +395,14 @@ export default function Account() {
                             [entry.id]: !current[entry.id],
                           }))
                         }
-                        className="rounded-full border border-white/10 bg-[#080C0E] px-4 py-2 font-mono text-[11px] font-semibold text-slate-300 transition hover:border-[#00FF9D]/50 hover:text-[#00FF9D] cursor-pointer"
+                        className="rounded-full border border-white/10 bg-[#080C0E] px-4 py-2 font-mono text-[11px] font-semibold text-slate-300 transition hover:border-[#00FF9D]/50 hover:text-[#00FF9D] active:scale-95 cursor-pointer"
                       >
                         {revealed[entry.id] ? "HIDE" : "REVEAL"}
                       </button>
                       <button
                         type="button"
                         onClick={() => copyKey(entry)}
-                        className="rounded-full border border-white/10 bg-[#080C0E] px-4 py-2 font-mono text-[11px] font-semibold text-slate-300 transition hover:border-[#00FF9D]/50 hover:text-[#00FF9D] cursor-pointer"
+                        className="rounded-full border border-white/10 bg-[#080C0E] px-4 py-2 font-mono text-[11px] font-semibold text-slate-300 transition hover:border-[#00FF9D]/50 hover:text-[#00FF9D] active:scale-95 cursor-pointer"
                       >
                         {copiedId === entry.id ? "COPIED ✓" : "COPY"}
                       </button>
@@ -411,7 +412,7 @@ export default function Account() {
                             ? `/sandbox?model=${encodeURIComponent(entry.modelId)}`
                             : "/sandbox"
                         }
-                        className="rounded-full bg-[#00FF9D] px-4 py-2 font-mono text-[11px] font-bold uppercase text-[#080C0E] transition-all hover:bg-[#10B981]"
+                        className="rounded-full bg-[#00FF9D] px-4 py-2 font-mono text-[11px] font-bold uppercase text-[#080C0E] transition-all hover:bg-[#10B981] active:scale-[0.98]"
                       >
                         Test →
                       </Link>

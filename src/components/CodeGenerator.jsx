@@ -102,7 +102,7 @@ export default function CodeGenerator({ model }) {
               key={lang}
               type="button"
               onClick={() => setLanguage(lang)}
-              className={`rounded-full px-3.5 py-1 font-mono text-[11px] font-medium transition-all cursor-pointer ${
+              className={`rounded-full px-3.5 py-1 font-mono text-[11px] font-medium transition-all active:scale-[0.98] cursor-pointer ${
                 language === lang
                   ? "bg-white/15 text-white shadow-sm border border-white/10"
                   : "text-slate-400 hover:text-white"
@@ -121,7 +121,7 @@ export default function CodeGenerator({ model }) {
         <button
           type="button"
           onClick={handleCopy}
-          className="absolute right-4 top-4 rounded-full border border-white/15 bg-[#0E141B]/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-slate-200 shadow-md backdrop-blur-md transition-all hover:border-[#00FF9D]/50 hover:text-[#00FF9D] cursor-pointer"
+          className="absolute right-4 top-4 rounded-full border border-white/15 bg-[#0E141B]/90 px-3.5 py-1.5 font-mono text-xs font-semibold text-slate-200 shadow-md backdrop-blur-md transition-all duration-200 hover:border-[#00FF9D]/50 hover:text-[#00FF9D] active:scale-95 cursor-pointer"
         >
           {copied ? "COPIED ✓" : "COPY SNIPPET"}
         </button>

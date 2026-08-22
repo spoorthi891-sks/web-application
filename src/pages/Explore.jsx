@@ -212,7 +212,7 @@ export default function Explore() {
             <div className="flex items-center gap-2">
               <Link
                 to="/compare"
-                className="hidden shrink-0 items-center gap-1 rounded-full border border-[#00FF9D]/40 bg-[#00FF9D]/[0.06] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-[#00FF9D] transition-all hover:bg-[#00FF9D]/15 hover:shadow-[0_0_20px_-4px_rgba(0,255,157,0.4)] sm:inline-flex"
+                className="hidden shrink-0 items-center gap-1 rounded-full border border-[#00FF9D]/40 bg-[#00FF9D]/[0.06] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-[#00FF9D] transition-all hover:bg-[#00FF9D]/15 hover:shadow-[0_0_20px_-4px_rgba(0,255,157,0.4)] active:scale-[0.98] sm:inline-flex"
               >
                 Compare costs
                 <span>→</span>
@@ -261,7 +261,7 @@ export default function Explore() {
             <button
               type="button"
               onClick={load}
-              className="mt-6 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981]"
+              className="mt-6 rounded-full bg-[#00FF9D] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#080C0E] shadow-[0_0_20px_rgba(0,255,157,0.3)] transition-all hover:bg-[#10B981] active:scale-[0.98] cursor-pointer"
             >
               Try again
             </button>
@@ -281,7 +281,7 @@ export default function Explore() {
                       type="button"
                       onClick={() => updateParam("cat", "")}
                       aria-pressed={selectedCategories.length === 0}
-                      className={`rounded-full border px-3.5 py-1 font-mono text-[11px] font-semibold transition-all duration-200 cursor-pointer ${
+                      className={`rounded-full border px-3.5 py-1 font-mono text-[11px] font-semibold transition-all duration-200 active:scale-[0.98] cursor-pointer ${
                         selectedCategories.length === 0
                           ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)]"
                           : "border-white/[0.08] bg-[#0E141B]/70 text-slate-400 hover:border-white/20 hover:text-white"
@@ -297,7 +297,7 @@ export default function Explore() {
                           type="button"
                           onClick={() => toggleListParam("cat")(category)}
                           aria-pressed={active}
-                          className={`rounded-full border px-3.5 py-1 font-mono text-[11px] font-semibold transition-all duration-200 cursor-pointer ${
+                          className={`rounded-full border px-3.5 py-1 font-mono text-[11px] font-semibold transition-all duration-200 active:scale-[0.98] cursor-pointer ${
                             active
                               ? "border-[#00FF9D]/60 bg-[#00FF9D]/10 text-[#00FF9D] shadow-[0_0_12px_rgba(0,255,157,0.15)]"
                               : "border-white/[0.08] bg-[#0E141B]/70 text-slate-400 hover:border-white/20 hover:text-white"
@@ -336,7 +336,7 @@ export default function Explore() {
                       <button
                         type="button"
                         onClick={clearFilters}
-                        className="font-mono text-xs font-semibold text-[#00FF9D] transition-colors hover:text-emerald-300 cursor-pointer"
+                        className="font-mono text-xs font-semibold text-[#00FF9D] transition-colors hover:text-emerald-300 active:scale-[0.98] cursor-pointer"
                       >
                         RESET FILTERS ({activeFilterCount})
                       </button>
@@ -373,15 +373,17 @@ export default function Explore() {
                     <button
                       type="button"
                       onClick={clearFilters}
-                      className="mt-4 rounded-full border border-white/10 bg-[#131B24] px-4 py-2 text-xs font-mono text-slate-300 hover:text-white cursor-pointer"
+                      className="mt-4 rounded-full border border-white/10 bg-[#131B24] px-4 py-2 text-xs font-mono text-slate-300 hover:text-white active:scale-[0.98] cursor-pointer"
                     >
                       Clear all filters
                     </button>
                   </div>
                 ) : (
                   <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {results.map((model) => (
-                      <ModelCard key={model.id} model={model} />
+                    {results.map((model, index) => (
+                      <div key={model.id} style={{ "--stagger": index % 12 }} className="stagger-item">
+                        <ModelCard model={model} />
+                      </div>
                     ))}
                   </div>
                 )}
