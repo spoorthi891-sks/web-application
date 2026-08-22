@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
+import ChatAssistant from "./components/ChatAssistant.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import Home from "./pages/Home.jsx";
 import Explore from "./pages/Explore.jsx";
@@ -70,6 +71,7 @@ export default function App() {
           </Routes>
         </main>
         <Footer />
+        <ChatAssistant />
       </ErrorBoundary>
     </div>
   );
