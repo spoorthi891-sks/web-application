@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { MODELS } from "../data/modelsRegistry.js";
 import { findMatches } from "../utils/matchmakerAlgo.js";
 import { formatUSD, priceLabel } from "../utils/costCalculator.js";
-import { normalizeIntent, parseIntentLocally } from "../utils/chatIntent.js";
+import {
+  isSmallTalk,
+  mergeIntents,
+  normalizeIntent,
+  parseIntentLocally,
+} from "../utils/chatIntent.js";
 
 const QUICK_REPLIES = [
   "I need cheap OCR for invoices under $0.01",
@@ -11,55 +17,34 @@ const QUICK_REPLIES = [
   "Accurate code generation assistant",
 ];
 
-function buildReply(intent) {
-  const matches = findMatches(intent, MODELS);
+const HELP_TEXT =
+  "I'm your model advisor — I match what you're building to our model registry.\n\nTell me:\n• the use case (OCR, chatbot, transcription…)\n• a budget (e.g. \"under $0.005\")\n• whether speed or accuracy matters more\n\nThen refine with things like \"something cheaper\" or \"faster options\".";
 
-  if (matches.length === 0) {
-    return (
-      "Nothing in our registry fits those limits yet. Try raising the " +
-      "budget or dropping a constraint and I will match models again."
-    );
-  }
-
-  const understood = [
+function describeIntent(intent) {
+  return [
     intent.category ? `category ${intent.category}` : null,
     intent.maxBudget != null ? `budget ≤ ${formatUSD(intent.maxBudget)}` : null,
     `${intent.priority} priority`,
   ]
     .filter(Boolean)
     .join(" · ");
-
-  const ranked = matches
-    .slice(0, 3)
-    .map((entry, index) => {
-      const model = entry.model;
-      return (
-        `${index + 1}. ${model.name} by ${model.provider}\n` +
-        `   ${priceLabel(model)} · ${model.latencyMs} ms latency · ` +
-        `benchmark score ${model.benchmarkScore}`
-      );
-    })
-    .join("\n");
-
-  return (
-    `Understood — ${understood}.\n\n${ranked}\n\n` +
-    `Open a model page for full specs, or send these to Compare for a ` +
-    `side-by-side table.`
-  );
 }
 
-async function resolveIntent(message) {
+async function resolveIntent(message, history) {
   try {
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, history }),
     });
     if (!response.ok) throw new Error("intent service unavailable");
     const data = await response.json();
-    return normalizeIntent(data.intent);
+    return {
+      intent: normalizeIntent(data.intent),
+      note: typeof data.note === "string" ? data.note : "",
+    };
   } catch {
-    return parseIntentLocally(message);
+    return { intent: parseIntentLocally(message), note: "" };
   }
 }
 
@@ -76,17 +61,52 @@ function TypingIndicator() {
   );
 }
 
+function ModelCard({ model, best }) {
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-[#080C0E] px-3 py-2 transition hover:border-[#00FF9D]/30">
+      <div className="min-w-0">
+        <p className="truncate text-xs font-semibold text-slate-100">
+          {best && <span className="text-[#00FF9D]">★ </span>}
+          {model.name}
+          <span className="font-normal text-slate-500"> · {model.provider}</span>
+        </p>
+        <p className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-wide text-slate-400">
+          {priceLabel(model)} · {model.latencyMs}ms · score{" "}
+          <span className="text-[#00FF9D]/80">{model.benchmarkScore}</span>
+        </p>
+      </div>
+      <Link
+        to={`/models/${encodeURIComponent(model.id)}`}
+        onClick={() => window.dispatchEvent(new CustomEvent("close-chat-assistant"))}
+        className="shrink-0 rounded-lg border border-[#00FF9D]/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-[#00FF9D] transition hover:bg-[#00FF9D]/10"
+      >
+        View
+      </Link>
+    </div>
+  );
+}
+
 export default function ChatAssistant() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const scrollRef = useRef(null);
+  const lastIntentRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const node = scrollRef.current;
     if (node) node.scrollTop = node.scrollHeight;
   }, [messages, busy, open]);
+
+  useEffect(() => {
+    function closePanel() {
+      setOpen(false);
+    }
+    window.addEventListener("close-chat-assistant", closePanel);
+    return () => window.removeEventListener("close-chat-assistant", closePanel);
+  }, []);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -102,18 +122,97 @@ export default function ChatAssistant() {
     if (!text || busy) return;
 
     setInput("");
-    setMessages((current) => [...current, { role: "user", content: text }]);
     setBusy(true);
 
+    const history = messages
+      .filter((m) => (m.role === "user" ? m.text : m.intro))
+      .slice(-4)
+      .map((m) => ({
+        role: m.role,
+        content: (m.role === "user" ? m.text : m.intro).slice(0, 200),
+      }));
+
     try {
-      const intent = await resolveIntent(text);
+      if (isSmallTalk(text) && !lastIntentRef.current) {
+        setMessages((current) => [
+          ...current,
+          { role: "assistant", intro: HELP_TEXT },
+        ]);
+        return;
+      }
+
+      const { intent: rawIntent, note } = await resolveIntent(text, history);
+      const intent = lastIntentRef.current
+        ? mergeIntents(lastIntentRef.current, rawIntent, text)
+        : rawIntent;
+      lastIntentRef.current = intent;
+
+      const matches = findMatches(intent, MODELS);
+
+      if (matches.length === 0) {
+        setMessages((current) => [
+          ...current,
+          {
+            role: "assistant",
+            intro:
+              "Nothing fits those limits yet — try raising your budget or dropping a constraint.",
+          },
+        ]);
+        return;
+      }
+
+      const intro = note
+        ? `${note} Showing the best ${describeIntent(intent)}.`
+        : `Understood — ${describeIntent(intent)}. Top picks:`;
+
       setMessages((current) => [
         ...current,
-        { role: "assistant", content: buildReply(intent) },
+        { role: "assistant", intro, matches, intent },
       ]);
     } finally {
       setBusy(false);
     }
+  }
+
+  function followUp(label, intent, matches) {
+    if (label === "__compare__") {
+      setOpen(false);
+      navigate("/compare", {
+        state: { models: matches.slice(0, 3).map((entry) => entry.model.id) },
+      });
+      return;
+    }
+    sendMessage(label);
+  }
+
+  function renderChips(message, index) {
+    if (message.role !== "assistant") return null;
+    const isLast = index === messages.length - 1;
+    const chips = ["Something cheaper", "Faster options", "More accuracy"];
+    return (
+      <div className={`flex flex-wrap gap-1.5 ${isLast ? "" : "hidden"} mt-2`}>
+        {message.matches?.length >= 2 && (
+          <button
+            type="button"
+            onClick={() => followUp("__compare__", message.intent, message.matches)}
+            className="rounded-full bg-[#00FF9D]/15 px-2.5 py-1 text-[11px] font-medium text-[#00FF9D] transition hover:bg-[#00FF9D]/25"
+          >
+            Compare these picks →
+          </button>
+        )}
+        {isLast &&
+          chips.map((chip) => (
+            <button
+              key={chip}
+              type="button"
+              onClick={() => followUp(chip, message.intent)}
+              className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-slate-400 transition hover:border-[#00FF9D]/40 hover:text-[#00FF9D]"
+            >
+              {chip}
+            </button>
+          ))}
+      </div>
+    );
   }
 
   if (!open) {
@@ -132,7 +231,7 @@ export default function ChatAssistant() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex h-[min(70vh,520px)] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0E141B]/95 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur">
+    <div className="fixed bottom-5 right-5 z-50 flex h-[min(74vh,560px)] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0E141B]/95 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur">
       <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-slate-500">
@@ -161,15 +260,24 @@ export default function ChatAssistant() {
         </p>
 
         {messages.map((message, index) => (
-          <div
-            key={index}
-            className={
-              message.role === "user"
-                ? "ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-[#00FF9D]/90 px-3 py-2 text-sm text-[#080C0E]"
-                : "mr-auto max-w-[90%] whitespace-pre-wrap rounded-2xl rounded-bl-md border border-white/10 bg-[#131B24] px-3 py-2 text-sm leading-relaxed text-slate-200"
-            }
-          >
-            {message.content}
+          <div key={index}>
+            <div
+              className={
+                message.role === "user"
+                  ? "ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-[#00FF9D]/90 px-3 py-2 text-sm text-[#080C0E]"
+                  : "mr-auto max-w-[92%] whitespace-pre-wrap rounded-2xl rounded-bl-md border border-white/10 bg-[#131B24] px-3 py-2 text-sm leading-relaxed text-slate-200"
+              }
+            >
+              {message.role === "user" ? message.text : message.intro}
+            </div>
+
+            {message.matches?.map((entry, cardIndex) => (
+              <div key={entry.model.id} className="mt-1.5 mr-auto max-w-[92%]">
+                <ModelCard model={entry.model} best={cardIndex === 0} />
+              </div>
+            ))}
+
+            {renderChips(message, index)}
           </div>
         ))}
 

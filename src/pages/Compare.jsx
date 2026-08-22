@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { MODELS, getModelById } from "../data/modelsRegistry.js";
 import {
   compareMonthlyCosts,
@@ -95,7 +95,13 @@ function SpecValue({ raw, isBest, big = false }) {
 }
 
 export default function Compare() {
-  const [selectedIds, setSelectedIds] = useState(DEFAULT_SELECTION);
+  const location = useLocation();
+  const handoffIds = Array.isArray(location.state?.models)
+    ? location.state.models.filter((id) => getModelById(id)).slice(0, MAX_SELECTION)
+    : [];
+  const [selectedIds, setSelectedIds] = useState(
+    handoffIds.length > 0 ? handoffIds : DEFAULT_SELECTION,
+  );
   const [monthlyRequests, setMonthlyRequests] = useState(250000);
   const [avgTokensPerRequest, setAvgTokensPerRequest] = useState(1200);
 

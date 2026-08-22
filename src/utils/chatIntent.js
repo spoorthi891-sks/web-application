@@ -86,3 +86,39 @@ export function parseIntentLocally(message = "") {
 
   return normalizeIntent({ category, maxBudget, priority });
 }
+
+export function mergeIntents(previous, next, text = "") {
+  const lower = text.toLowerCase();
+  const merged = {
+    category: next.category || previous.category,
+    maxBudget: next.maxBudget ?? previous.maxBudget,
+    priority: next.priority !== "balanced" ? next.priority : previous.priority,
+  };
+  if (
+    /cheap|cheaper|afford|lower|less|reduce/.test(lower) &&
+    next.maxBudget != null &&
+    previous.maxBudget != null
+  ) {
+    merged.maxBudget = Math.min(next.maxBudget, previous.maxBudget);
+  } else if (
+    /cheap|cheaper|lower/.test(lower) &&
+    next.maxBudget == null &&
+    previous.maxBudget != null
+  ) {
+    merged.maxBudget = Number((previous.maxBudget / 2).toFixed(6));
+  }
+  if (/fast(er)?|speed|quick|snappy/.test(lower)) merged.priority = "speed";
+  else if (/accura|quality|smart|better score/.test(lower)) merged.priority = "accuracy";
+  return merged;
+}
+
+export function isSmallTalk(text = "") {
+  const trimmed = text.trim().toLowerCase();
+  if (trimmed.length > 30) return false;
+  return (
+    /^(hi+|hey+|hello+|yo|sup|hola|namaste)\b/.test(trimmed) ||
+    /^(thanks|thank you|thx|ty)\b/.test(trimmed) ||
+    /^(ok(ay)?|cool|nice|great|awesome|good)\b/.test(trimmed) ||
+    /^(help|what can you do|who are you)\b/.test(trimmed)
+  );
+}
