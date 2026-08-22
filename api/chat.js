@@ -15,15 +15,21 @@ export default async function handler(req, res) {
     return;
   }
 
-  let body = req.body;
-  if (typeof body === "string") {
-    try {
-      body = JSON.parse(body);
-    } catch {
-      body = {};
+  let message = "";
+  try {
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        body = {};
+      }
     }
+    message = String(body?.message ?? "").slice(0, 600);
+  } catch (parseError) {
+    res.status(400).json({ ok: false, error: "Invalid request body" });
+    return;
   }
-  const message = String(body?.message ?? "").slice(0, 600);
   if (!message.trim()) {
     res.status(400).json({ error: "Missing message" });
     return;
