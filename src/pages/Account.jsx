@@ -151,9 +151,9 @@ export default function Account() {
 
   if (!session) {
     return (
-      <div className="relative min-h-screen bg-[#080C0E]">
+      <div className="relative flex min-h-screen items-center justify-center bg-[#080C0E] px-6">
         <div className="pointer-events-none absolute top-10 left-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-[#00FF9D]/[0.05] blur-[140px]" />
-        <div className="relative mx-auto max-w-md px-6 py-32 text-center">
+        <div className="relative w-full max-w-md py-16 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-2xl shadow-[0_0_25px_rgba(0,255,157,0.2)]">
             🔒
           </div>
